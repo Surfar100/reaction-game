@@ -1056,12 +1056,12 @@ class Pacman {
             const gridX = Math.floor(this.x / TILE_SIZE);
             const gridY = Math.floor(this.y / TILE_SIZE);
 
-            // Warp logic
+            // Warp logic (using center-tile alignment to prevent corridor offset drift)
             if (gridX === 0 && this.dir === DIR_LEFT) {
-                this.x = (COLS - 1) * TILE_SIZE;
+                this.x = (COLS - 0.5) * TILE_SIZE;
                 return;
             } else if (gridX === COLS - 1 && this.dir === DIR_RIGHT) {
-                this.x = 0;
+                this.x = 0.5 * TILE_SIZE;
                 return;
             }
 
@@ -1267,12 +1267,12 @@ class Ghost {
             const gridX = Math.floor(this.x / TILE_SIZE);
             const gridY = Math.floor(this.y / TILE_SIZE);
 
-            // Warp logic
+            // Warp logic (using center-tile alignment to prevent corridor offset drift)
             if (gridX === 0 && this.dir === DIR_LEFT) {
-                this.x = (COLS - 1) * TILE_SIZE;
+                this.x = (COLS - 0.5) * TILE_SIZE;
                 return;
             } else if (gridX === COLS - 1 && this.dir === DIR_RIGHT) {
-                this.x = 0;
+                this.x = 0.5 * TILE_SIZE;
                 return;
             }
 
