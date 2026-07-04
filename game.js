@@ -431,6 +431,7 @@ class Game {
         this.gameState = STATE.PLAYING;
         this.lastTime = performance.now();
         this.sound.startSiren();
+        requestAnimationFrame((t) => this.gameLoop(t));
     }
 
     resetMap() {
