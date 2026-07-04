@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Neon Arcade - Pac-Man</title>
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts for Retro Arcade Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="arcade-wrapper">
+        <!-- Main Cabinet Container -->
+        <div class="arcade-container">
+            <!-- Arcade Cabinet Header / Neon Sign -->
+            <header class="arcade-header">
+                <h1 class="neon-text" data-text="NEON ARCADE">NEON ARCADE</h1>
+                <p class="neon-subtitle">RETRO CHIP EDITION</p>
+            </header>
+
+            <!-- Main Cabinet Body -->
+            <div class="cabinet-body">
+                <!-- Glass Screen Bezel -->
+                <div class="screen-bezel">
+                    <!-- Retro CRT Scanline Overlay -->
+                    <div class="crt-overlay"></div>
+                    
+                    <!-- Game Header HUD -->
+                    <div class="hud-container">
+                        <div class="hud-item score-board">
+                            <span class="hud-label">SCORE</span>
+                            <span id="score" class="hud-value neon-green">000000</span>
+                        </div>
+                        <div class="hud-item high-score-board">
+                            <span class="hud-label">HIGH SCORE</span>
+                            <span id="high-score" class="hud-value neon-pink">000000</span>
+                        </div>
+                        <div class="hud-item lives-board">
+                            <span class="hud-label">LIVES</span>
+                            <div id="lives-container" class="lives-icons">
+                                <!-- JS will inject pacman icons here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screen Screen Content (Canvas & Overlays) -->
+                    <div class="screen-content">
+                        <canvas id="gameCanvas" width="512" height="544"></canvas>
+
+                        <!-- Game Screen Overlay (Start/Pause/GameOver) -->
+                        <div id="overlay" class="game-overlay active">
+                            <div class="overlay-card">
+                                <h2 id="overlay-title" class="neon-yellow">READY PLAYER ONE</h2>
+                                <p id="overlay-message">USE ARROWS OR WASD TO NAVIGATE</p>
+                                <button id="start-btn" class="arcade-btn">INSERT COIN</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Game Footer HUD -->
+                    <div class="hud-footer">
+                        <div class="hud-item">
+                            <span class="hud-label">LEVEL</span>
+                            <span id="level" class="hud-value neon-blue">1</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">STATUS</span>
+                            <span id="status-text" class="hud-value neon-yellow">INSERT COIN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls/Instruction Bezel -->
+            <div class="cabinet-lower-panel">
+                <div class="joystick-graphics">
+                    <div class="joystick-base">
+                        <div class="joystick-ball"></div>
+                    </div>
+                    <div class="action-buttons">
+                        <div class="action-btn-red"></div>
+                        <div class="action-btn-blue"></div>
+                    </div>
+                </div>
+                <div class="cabinet-instructions">
+                    <h3>HOW TO PLAY</h3>
+                    <ul>
+                        <li>Use <span class="key-cap">▲</span> <span class="key-cap">▼</span> <span class="key-cap">◀</span> <span class="key-cap">▶</span> or <span class="key-cap">W</span> <span class="key-cap">A</span> <span class="key-cap">S</span> <span class="key-cap">D</span> to steer.</li>
+                        <li>Eat all dots to complete the level.</li>
+                        <li>Eat <span class="pellet-highlight">POWER PELLETS</span> to make the ghosts vulnerable.</li>
+                        <li>Avoid ghosts or lose a life!</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Audio and Action Buttons -->
+            <div class="system-controls">
+                <button id="mute-btn" class="system-btn">🔊 Mute</button>
+                <button id="pause-btn" class="system-btn" disabled>⏸ Pause</button>
+            </div>
+        </div>
+
+        <!-- Side Panel for Global Leaderboard & Authentication -->
+        <div class="side-panel">
+            <!-- Connection Status Indicator -->
+            <div class="panel-header">
+                <span class="status-indicator-label">SUPABASE DATABASE:</span>
+                <span id="db-status" class="status-indicator offline">OFFLINE</span>
+            </div>
+
+            <!-- Auth Section -->
+            <div class="auth-section card">
+                <div id="auth-logged-out">
+                    <h3 class="panel-title neon-pink-text">PLAYER AUTH</h3>
+                    
+                    <div class="auth-toggle">
+                        <button id="toggle-login-btn" class="toggle-btn active">LOGIN</button>
+                        <button id="toggle-register-btn" class="toggle-btn">REGISTER</button>
+                    </div>
+
+                    <form id="auth-form" class="auth-form">
+                        <div class="input-group" id="username-group" style="display: none;">
+                            <label for="auth-username">USERNAME</label>
+                            <input type="text" id="auth-username" autocomplete="off" placeholder="PAC_MAN_MASTER">
+                        </div>
+                        <div class="input-group">
+                            <label for="auth-email">EMAIL</label>
+                            <input type="email" id="auth-email" required placeholder="player@email.com">
+                        </div>
+                        <div class="input-group">
+                            <label for="auth-password">PASSWORD</label>
+                            <input type="password" id="auth-password" required placeholder="******">
+                        </div>
+                        <button type="submit" id="auth-submit-btn" class="arcade-btn-mini">SUBMIT</button>
+                    </form>
+                    <div id="auth-error-msg" class="auth-error"></div>
+                </div>
+
+                <div id="auth-logged-in" style="display: none;">
+                    <h3 class="panel-title neon-green-text">PLAYER PROFILE</h3>
+                    <div class="profile-info">
+                        <span class="profile-label">PLAYER:</span>
+                        <span id="player-username" class="profile-value neon-yellow-text">-</span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-label">PERSONAL BEST:</span>
+                        <span id="player-pb" class="profile-value neon-blue-text">000000</span>
+                    </div>
+                    <button id="logout-btn" class="arcade-btn-mini reset-btn">LOG OUT</button>
+                </div>
+            </div>
+
+            <!-- Leaderboard Section -->
+            <div class="leaderboard-section card">
+                <h3 class="panel-title neon-cyan-text">GLOBAL TOP 10</h3>
+                <div class="leaderboard-table-container">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>RK</th>
+                                <th>PLAYER</th>
+                                <th>SCORE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <tr><td colspan="3" class="loading-text">LOADING SCORES...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel Footer -->
+            <div class="panel-footer">
+                <button id="reset-config-btn" class="footer-link">🔧 Reset Database Config</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Setup Configuration Modal -->
+    <div id="setup-modal" class="setup-overlay">
+        <div class="setup-card">
+            <h2 class="neon-yellow-text">CONNECT TO SUPABASE</h2>
+            <p>Connect your own Supabase instance to store global high scores and enable account registration.</p>
+            
+            <form id="setup-form" class="setup-form">
+                <div class="input-group">
+                    <label for="setup-url">SUPABASE URL</label>
+                    <input type="url" id="setup-url" required placeholder="https://your-project-id.supabase.co" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label for="setup-key">SUPABASE ANON KEY</label>
+                    <input type="text" id="setup-key" required placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." autocomplete="off">
+                </div>
+                
+                <div class="setup-instructions">
+                    <h4>How to get keys:</h4>
+                    <ol>
+                        <li>Log in to your <strong>Supabase Dashboard</strong>.</li>
+                        <li>Select your project, go to <strong>Project Settings</strong> &gt; <strong>API</strong>.</li>
+                        <li>Copy the <strong>Project URL</strong> and the <strong>anon public API key</strong>.</li>
+                    </ol>
+                </div>
+                
+                <button type="submit" class="arcade-btn">SAVE & CONNECT</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Web Application Logic -->
+    <script src="game.js"></script>
+</body>
+</html>
