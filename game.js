@@ -304,8 +304,23 @@ class Game {
 
         const resetConfigBtn = document.getElementById('reset-config-btn');
         if (resetConfigBtn) {
-            resetConfigBtn.addEventListener('click', () => {
-                if (confirm("Are you sure you want to reset your Supabase credentials?")) {
+            resetConfigBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('setup-modal').classList.add('active');
+            });
+        }
+
+        const closeSetupBtn = document.getElementById('close-setup-btn');
+        if (closeSetupBtn) {
+            closeSetupBtn.addEventListener('click', () => {
+                document.getElementById('setup-modal').classList.remove('active');
+            });
+        }
+
+        const useDefaultBtn = document.getElementById('use-default-btn');
+        if (useDefaultBtn) {
+            useDefaultBtn.addEventListener('click', () => {
+                if (confirm("Reset configuration to the default game database project?")) {
                     localStorage.removeItem('supabase_url');
                     localStorage.removeItem('supabase_key');
                     window.location.reload();
@@ -748,8 +763,11 @@ class Game {
     }
 
     initSupabase() {
-        let url = localStorage.getItem('supabase_url');
-        let key = localStorage.getItem('supabase_key');
+        const DEFAULT_URL = 'https://fhurbhnkmcntlrwbdvrm.supabase.co';
+        const DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZodXJiaG5rbWNudGxyd2JkdnJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTY5OTEsImV4cCI6MjA5ODY3Mjk5MX0.-Blcs3fh7ecIuMQGaSjWZByVLXbWf5_4vqgETKN_6Ow';
+
+        let url = localStorage.getItem('supabase_url') || DEFAULT_URL;
+        let key = localStorage.getItem('supabase_key') || DEFAULT_KEY;
         
         const dbStatus = document.getElementById('db-status');
         const setupModal = document.getElementById('setup-modal');
