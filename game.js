@@ -1133,19 +1133,19 @@ class Pacman {
     }
 
     update(grid, sound, game) {
+        // Warp logic (independent of grid alignment and reference comparisons to prevent getting stuck off-screen)
+        if (this.x < 0.5 * TILE_SIZE && this.dir.x === -1) {
+            this.x = (COLS - 0.5) * TILE_SIZE;
+            return;
+        } else if (this.x > (COLS - 0.5) * TILE_SIZE && this.dir.x === 1) {
+            this.x = 0.5 * TILE_SIZE;
+            return;
+        }
+
         // Standard Grid Alignment check
         if ((this.x - TILE_SIZE/2) % TILE_SIZE === 0 && (this.y - TILE_SIZE/2) % TILE_SIZE === 0) {
             const gridX = Math.floor(this.x / TILE_SIZE);
             const gridY = Math.floor(this.y / TILE_SIZE);
-
-            // Warp logic (using center-tile alignment to prevent corridor offset drift)
-            if (gridX === 0 && this.dir === DIR_LEFT) {
-                this.x = (COLS - 0.5) * TILE_SIZE;
-                return;
-            } else if (gridX === COLS - 1 && this.dir === DIR_RIGHT) {
-                this.x = 0.5 * TILE_SIZE;
-                return;
-            }
 
             // Check if we can apply the queued next direction
             if (this.canMove(gridX, gridY, this.nextDir, grid)) {
@@ -1273,19 +1273,19 @@ class Policeman {
     }
 
     update(grid) {
+        // Warp logic (independent of grid alignment and reference comparisons to prevent getting stuck off-screen)
+        if (this.x < 0.5 * TILE_SIZE && this.dir.x === -1) {
+            this.x = (COLS - 0.5) * TILE_SIZE;
+            return;
+        } else if (this.x > (COLS - 0.5) * TILE_SIZE && this.dir.x === 1) {
+            this.x = 0.5 * TILE_SIZE;
+            return;
+        }
+
         // Standard Grid Alignment check
         if ((this.x - TILE_SIZE/2) % TILE_SIZE === 0 && (this.y - TILE_SIZE/2) % TILE_SIZE === 0) {
             const gridX = Math.floor(this.x / TILE_SIZE);
             const gridY = Math.floor(this.y / TILE_SIZE);
-
-            // Warp logic
-            if (gridX === 0 && this.dir === DIR_LEFT) {
-                this.x = (COLS - 0.5) * TILE_SIZE;
-                return;
-            } else if (gridX === COLS - 1 && this.dir === DIR_RIGHT) {
-                this.x = 0.5 * TILE_SIZE;
-                return;
-            }
 
             // Find valid patrol paths (excluding reversing path unless blocked)
             const directions = [DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT];
@@ -1485,19 +1485,19 @@ class Ghost {
             this.speed = (dots < 30) ? 4 : 2;
         }
 
+        // Warp logic (independent of grid alignment and reference comparisons to prevent getting stuck off-screen)
+        if (this.x < 0.5 * TILE_SIZE && this.dir.x === -1) {
+            this.x = (COLS - 0.5) * TILE_SIZE;
+            return;
+        } else if (this.x > (COLS - 0.5) * TILE_SIZE && this.dir.x === 1) {
+            this.x = 0.5 * TILE_SIZE;
+            return;
+        }
+
         // Main Movement (Grid Alignment checks)
         if ((this.x - TILE_SIZE/2) % TILE_SIZE === 0 && (this.y - TILE_SIZE/2) % TILE_SIZE === 0) {
             const gridX = Math.floor(this.x / TILE_SIZE);
             const gridY = Math.floor(this.y / TILE_SIZE);
-
-            // Warp logic (using center-tile alignment to prevent corridor offset drift)
-            if (gridX === 0 && this.dir === DIR_LEFT) {
-                this.x = (COLS - 0.5) * TILE_SIZE;
-                return;
-            } else if (gridX === COLS - 1 && this.dir === DIR_RIGHT) {
-                this.x = 0.5 * TILE_SIZE;
-                return;
-            }
 
             // Pathfinding decisions at intersections
             const targetTile = this.determineTargetTile(pacman, grid);
