@@ -14,12 +14,61 @@
 </head>
 <body>
     <div class="arcade-wrapper">
+        <!-- LEFT: About Me / Developer Profile Panel -->
+        <!-- LEFT: About Lestonia / Developer Profile Panel -->
+        <div class="profile-panel side-panel">
+            <div class="dashboard-card" style="padding: 20px;">
+                <div class="profile-avatar-card">
+                    <div class="avatar-frame" style="border-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue);">
+                        <!-- Retro Police Badge Icon -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7A3,3 0 0,1 15,10A3,3 0 0,1 12,13A3,3 0 0,1 9,10A3,3 0 0,1 12,7M12,15C14,15 15,16 15,17V18H9V17C9,16 10,15 12,15Z" />
+                        </svg>
+                    </div>
+                    <h2 class="profile-title">LESTONIA PD</h2>
+                    <span class="profile-subtitle" style="color: var(--neon-blue);">OFFICER PÄÄRU-OTT</span>
+                </div>
+                
+                <div class="bio-text" style="margin-top: 14px; text-align: left; font-size: 0.72rem; line-height: 1.4;">
+                    <p style="margin-bottom: 10px; color: #fff;">This little retro arcade game is part of a much bigger project called <strong>Lestonia</strong>.</p>
+                    <p style="color: #a8a8cf;">Lestonia is a quiet little village where everyday life becomes surprisingly important. Follow the adventures of Officer Pääru-Ott Üksjalg, the village's only police officer, as he patrols the peaceful streets, investigates unusual incidents, trains for his annual police fitness test, develops small programming projects and occasionally enjoys a well-earned donut.</p>
+                </div>
+            </div>
+
+            <!-- Coming Soon Card -->
+            <div class="dashboard-card" style="padding: 16px;">
+                <div class="card-header" style="text-align: center; margin-bottom: 8px;">
+                    <h3 class="neon-pink" style="font-family: var(--font-title); font-size: 0.58rem; letter-spacing: 0.5px;">COMING SOON</h3>
+                </div>
+                <p style="font-size: 0.7rem; color: #fff; margin-bottom: 4px; font-weight: bold; text-align: center;">🎥 Bodycam Chronicle</p>
+                <p style="font-size: 0.68rem; color: #8080a0; text-align: center; line-height: 1.35;">Join Officer Pääru-Ott as he records his daily patrols through the world's most peaceful village (YouTube series).</p>
+            </div>
+
+            <!-- Support Lestonia Card -->
+            <div class="dashboard-card" style="padding: 16px; text-align: center;">
+                <div class="card-header" style="margin-bottom: 8px;">
+                    <h3 class="neon-yellow-text" style="font-family: var(--font-title); font-size: 0.58rem; letter-spacing: 0.5px;">🍩 SUPPORT LESTONIA</h3>
+                </div>
+                <p style="font-size: 0.68rem; color: #a8a8cf; line-height: 1.35; margin-bottom: 12px;">If you enjoyed the game and would like to support future projects, consider buying Pääru-Ott a donut.</p>
+                <a href="https://paypal.me/lestoniapd" target="_blank" class="arcade-btn" style="text-decoration: none; display: inline-block; font-size: 0.58rem; padding: 10px 0; width: 100%; box-shadow: 0 4px 0 #6d0034;">🍩 Buy Pääru a Donut</a>
+            </div>
+
+            <!-- Disclaimer footer -->
+            <div style="font-size: 0.62rem; color: #505075; line-height: 1.35; text-align: center; padding: 8px 6px; border-top: 1px solid #1a1a3a;">
+                <strong style="color: #6a6a9f; display: block; margin-bottom: 4px; font-family: var(--font-hud); font-size: 0.5rem; letter-spacing: 0.5px;">ABOUT LESTONIA</strong>
+                Lestonia is a fictional village where even the smallest events become official police investigations. Follow Officer Pääru-Ott Üksjalg as he patrols the quietest village in the world.
+            </div>
+        </div>
+
         <!-- Main Cabinet Container -->
         <div class="arcade-container">
             <!-- Arcade Cabinet Header / Neon Sign -->
             <header class="arcade-header">
                 <h1 class="neon-text" data-text="NEON ARCADE">NEON ARCADE</h1>
                 <p class="neon-subtitle">RETRO CHIP EDITION</p>
+                <div style="margin-top: 8px;">
+                    <a href="pinball.html" class="footer-link" style="text-decoration: none; padding: 4px 10px; background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon-blue); border-radius: 4px; font-size: 0.7rem; font-family: var(--font-hud); letter-spacing: 0.5px; color: var(--neon-blue); display: inline-block;">🕹️ PLAY PINBALL</a>
+                </div>
             </header>
 
             <!-- Main Cabinet Body -->
