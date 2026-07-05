@@ -246,6 +246,7 @@ class Game {
         this.pacman = null;
         this.ghosts = [];
         this.powerPelletTimer = 0;
+        this.policeEscortTimer = 0; // Tick timer for Officer Pääru-Ott Escort super power
         this.ghostsEatenMultiplier = 1;
         
         this.activeKeys = {};
@@ -450,6 +451,9 @@ class Game {
             new Ghost(11.5 * TILE_SIZE, 14.5 * TILE_SIZE, 'cyan', DIR_UP, { x: 31, y: 33 }, 3000 * delayMultiplier),  // Inky
             new Ghost(19.5 * TILE_SIZE, 14.5 * TILE_SIZE, 'orange', DIR_UP, { x: 0, y: 33 }, 6000 * delayMultiplier)  // Clyde
         ];
+
+        // Spawn Policeman on the left side of the map at row 24, col 6.5
+        this.policeman = new Policeman(6.5 * TILE_SIZE, 24.5 * TILE_SIZE);
     }
 
     togglePause() {
@@ -636,12 +640,63 @@ class Game {
             }
         }
 
+        // Update police escort timer
+        if (this.policeEscortTimer > 0) {
+            this.policeEscortTimer -= dt;
+            if (this.policeEscortTimer <= 0) {
+                this.policeEscortTimer = 0;
+            }
+        }
+
         // Update Pac-man
         this.pacman.update(this.grid, this.sound, this);
 
+        // Update Policeman
+        if (this.policeman) {
+            this.policeman.update(this.grid);
+            
+            // Collision between Pac-man and Policeman -> grant Police Escort
+            const distToOfficer = Math.hypot(this.pacman.x - this.policeman.x, this.pacman.y - this.policeman.y);
+            if (distToOfficer < 10) {
+                if (this.policeEscortTimer <= 0) {
+                    this.sound.playPowerUp();
+                    this.floatingPoints.push({
+                        x: this.pacman.x,
+                        y: this.pacman.y,
+                        text: "PD ESCORT!",
+                        timer: 1200
+                    });
+                }
+                this.policeEscortTimer = 20000; // 20 seconds
+            }
+        }
+
         // Update Ghosts
         this.ghosts.forEach(ghost => {
+            // Update individual arrested state timers
+            if (ghost.arrestedTimer > 0) {
+                ghost.arrestedTimer -= dt;
+                if (ghost.arrestedTimer <= 0) {
+                    ghost.exitArrested();
+                }
+            }
+
             ghost.update(this.grid, this.pacman, dt);
+            
+            // Collision between Policeman and Ghost -> Arrest Ghost!
+            if (this.policeman && !ghost.isEaten && ghost.arrestedTimer <= 0) {
+                const distToOfficer = Math.hypot(ghost.x - this.policeman.x, ghost.y - this.policeman.y);
+                if (distToOfficer < 10) {
+                    ghost.becomeArrested();
+                    this.sound.playEatGhost(); // Arrest sound effect
+                    this.floatingPoints.push({
+                        x: ghost.x,
+                        y: ghost.y,
+                        text: "ARRESTED!",
+                        timer: 1200
+                    });
+                }
+            }
             
             // Check Collisions
             const dist = Math.hypot(this.pacman.x - ghost.x, this.pacman.y - ghost.y);
@@ -663,9 +718,23 @@ class Game {
                     });
 
                     this.ghostsEatenMultiplier *= 2;
-                } else if (!ghost.isEaten) {
-                    // Pac-Man hit!
-                    this.handleDeath();
+                } else if (!ghost.isEaten && ghost.arrestedTimer <= 0) {
+                    // Pac-Man hit! Only if Pac-man doesn't have police escort
+                    if (this.policeEscortTimer > 0) {
+                        // Grant immunity & Eat Ghost like power pellet!
+                        this.sound.playEatGhost();
+                        ghost.becomeEaten();
+                        const scoreReward = 200;
+                        this.addScore(scoreReward);
+                        this.floatingPoints.push({
+                            x: ghost.x,
+                            y: ghost.y,
+                            text: `+${scoreReward}`,
+                            timer: 800
+                        });
+                    } else {
+                        this.handleDeath();
+                    }
                 }
             }
         });
@@ -673,6 +742,18 @@ class Game {
         // Update floaters
         this.floatingPoints.forEach(f => f.timer -= dt);
         this.floatingPoints = this.floatingPoints.filter(f => f.timer > 0);
+
+        // Update HUD status text with police escort timer info
+        if (this.gameState === STATE.PLAYING) {
+            if (this.policeEscortTimer > 0) {
+                const sec = Math.ceil(this.policeEscortTimer / 1000);
+                this.statusEl.textContent = `🚨 SIREN: ${sec}S`;
+                this.statusEl.className = "hud-value " + (Math.floor(performance.now() / 250) % 2 === 0 ? "neon-pink" : "neon-blue");
+            } else {
+                this.statusEl.textContent = "PLAYING";
+                this.statusEl.className = "hud-value neon-green";
+            }
+        }
 
         this.checkWinCondition();
     }
@@ -686,6 +767,7 @@ class Game {
 
         // Draw Entities
         this.pacman.draw(this.ctx);
+        if (this.policeman) this.policeman.draw(this.ctx);
         this.ghosts.forEach(g => g.draw(this.ctx));
 
         // Draw floating score tags
@@ -1121,9 +1203,23 @@ class Pacman {
     }
 
     draw(ctx) {
-        ctx.fillStyle = '#ffff00';
-        ctx.shadowColor = '#ffff00';
-        ctx.shadowBlur = 6;
+        let bodyColor = '#ffff00';
+        let glowColor = '#ffff00';
+        let glowSize = 6;
+        
+        const escortTime = window.gameEngine ? window.gameEngine.policeEscortTimer : 0;
+        if (escortTime > 0) {
+            // Flash red and blue every 150ms
+            const isRed = Math.floor(escortTime / 150) % 2 === 0;
+            bodyColor = isRed ? '#ff003c' : '#00f3ff';
+            glowColor = isRed ? '#ff003c' : '#00f3ff';
+            glowSize = 12;
+        }
+
+        ctx.save();
+        ctx.fillStyle = bodyColor;
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = glowSize;
         ctx.beginPath();
         
         const startMouth = this.dir.angle + this.mouthAngle * Math.PI;
@@ -1132,7 +1228,7 @@ class Pacman {
         ctx.arc(this.x, this.y, 8, startMouth, endMouth);
         ctx.lineTo(this.x, this.y);
         ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.restore();
     }
 
     drawDeath(ctx, frame) {
@@ -1161,6 +1257,109 @@ class Pacman {
     }
 }
 
+// Policeman (Officer Pääru-Ott) Entity Definition
+class Policeman {
+    constructor(x, y) {
+        this.reset(x, y);
+    }
+
+    reset(x, y) {
+        this.x = x;
+        this.y = y;
+        // Start moving left
+        this.dir = DIR_LEFT;
+        this.speed = 1; // 1 pixel/frame to ensure perfect grid-alignment step
+        this.badgeFlicker = 0;
+    }
+
+    update(grid) {
+        // Standard Grid Alignment check
+        if ((this.x - TILE_SIZE/2) % TILE_SIZE === 0 && (this.y - TILE_SIZE/2) % TILE_SIZE === 0) {
+            const gridX = Math.floor(this.x / TILE_SIZE);
+            const gridY = Math.floor(this.y / TILE_SIZE);
+
+            // Warp logic
+            if (gridX === 0 && this.dir === DIR_LEFT) {
+                this.x = (COLS - 0.5) * TILE_SIZE;
+                return;
+            } else if (gridX === COLS - 1 && this.dir === DIR_RIGHT) {
+                this.x = 0.5 * TILE_SIZE;
+                return;
+            }
+
+            // Find valid patrol paths (excluding reversing path unless blocked)
+            const directions = [DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT];
+            const validDirs = directions.filter(d => {
+                if (d.x === -this.dir.x && d.y === -this.dir.y) return false;
+                return this.canMove(gridX, gridY, d, grid);
+            });
+
+            if (validDirs.length > 0) {
+                this.dir = validDirs[Math.floor(Math.random() * validDirs.length)];
+            } else {
+                const opposite = { x: -this.dir.x, y: -this.dir.y, angle: (this.dir.angle + Math.PI) % (Math.PI * 2) };
+                if (this.canMove(gridX, gridY, opposite, grid)) {
+                    this.dir = opposite;
+                }
+            }
+        }
+
+        // Advance Officer positions
+        this.x += this.dir.x * this.speed;
+        this.y += this.dir.y * this.speed;
+        this.badgeFlicker += 0.1;
+    }
+
+    canMove(gridX, gridY, direction, grid) {
+        const nextX = gridX + direction.x;
+        const nextY = gridY + direction.y;
+        if (nextX < 0 || nextX >= COLS || nextY < 0 || nextY >= ROWS) return true; // tunnels warp
+        
+        const cell = grid[nextY][nextX];
+        return cell !== 1 && cell !== 4; // cannot enter walls or ghost gate
+    }
+
+    draw(ctx) {
+        ctx.save();
+        
+        // Draw blue uniform body
+        ctx.fillStyle = '#1e3cff';
+        ctx.shadowColor = '#1e3cff';
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw Police cap
+        ctx.fillStyle = '#060a33';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - 4, 6, Math.PI, 0);
+        ctx.fill();
+        
+        // Cap Visor
+        ctx.fillStyle = '#000';
+        ctx.fillRect(this.x - 7, this.y - 5, 14, 2);
+
+        // Flashing siren light on head
+        const flash = Math.floor(this.badgeFlicker) % 2 === 0;
+        ctx.fillStyle = flash ? '#00f3ff' : '#ff007f';
+        ctx.shadowColor = flash ? '#00f3ff' : '#ff007f';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - 9, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Golden Badge
+        ctx.fillStyle = '#ffff00';
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+    }
+}
+
 // Ghost Entity Definition
 class Ghost {
     constructor(x, y, color, startDir, scatterTile, startDelay = 0) {
@@ -1178,13 +1377,14 @@ class Ghost {
         
         this.isFrightened = false;
         this.isEaten = false;
+        this.arrestedTimer = 0; // Tick timer for policeman lockup (20 seconds)
         this.inHouse = this.y > 11 * TILE_SIZE; // inside home box initially
         this.exitProgress = 0;
         this.chaseTimer = 0;
     }
 
     becomeFrightened() {
-        if (!this.isEaten) {
+        if (!this.isEaten && this.arrestedTimer <= 0) {
             this.isFrightened = true;
             this.speed = 1; // slow down in frightened mode
             // reverse direction immediately on entering frightened mode
@@ -1194,7 +1394,7 @@ class Ghost {
 
     exitFrightened() {
         this.isFrightened = false;
-        if (!this.isEaten) {
+        if (!this.isEaten && this.arrestedTimer <= 0) {
             this.speed = 2;
         }
     }
@@ -1205,7 +1405,30 @@ class Ghost {
         this.speed = 4; // return extremely fast to base!
     }
 
+    becomeArrested() {
+        this.isFrightened = false;
+        this.isEaten = false;
+        this.arrestedTimer = 20000; // 20 seconds
+        this.x = 15.5 * TILE_SIZE;  // Teleport to center of house
+        this.y = 14.5 * TILE_SIZE;
+        this.inHouse = true;
+        this.speed = 0; // Freeze movement!
+    }
+
+    exitArrested() {
+        this.arrestedTimer = 0;
+        this.speed = 2;
+        this.startDelay = 1000; // Rest in house 1 second before exiting
+    }
+
     update(grid, pacman, dt) {
+        // Sit still inside the house if arrested
+        if (this.arrestedTimer > 0) {
+            this.x = 15.5 * TILE_SIZE;
+            this.y = 14.5 * TILE_SIZE;
+            return;
+        }
+
         // Handle initial delay inside ghost house
         if (this.startDelay > 0) {
             this.startDelay -= dt;
@@ -1424,6 +1647,10 @@ class Ghost {
             const flash = (remaining < 2500) && (Math.floor(remaining / 250) % 2 === 0);
             bodyColor = flash ? '#ffffff' : '#1c1cff';
             glowColor = flash ? '#ffffff' : '#3d3dff';
+        } else if (this.arrestedTimer > 0) {
+            bodyColor = '#002699';
+            glowColor = '#00f3ff';
+            ctx.globalAlpha = 0.55;
         } else {
             if (this.color === 'red') { bodyColor = '#ff003c'; glowColor = '#ff003c'; }
             if (this.color === 'pink') { bodyColor = '#ff00ea'; glowColor = '#ff00ea'; }
@@ -1470,6 +1697,27 @@ class Ghost {
             ctx.stroke();
         }
 
+        // Draw padlock over arrested ghost
+        if (this.arrestedTimer > 0) {
+            ctx.globalAlpha = 1.0;
+            
+            // Draw Padlock shackle (U-shape)
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y - 3, 3, Math.PI, 0);
+            ctx.stroke();
+            
+            // Draw Padlock body
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(this.x - 4, this.y - 1, 8, 7);
+            
+            // Small keyhole
+            ctx.fillStyle = '#000';
+            ctx.fillRect(this.x - 1, this.y + 1, 2, 3);
+        }
+
+        ctx.globalAlpha = 1.0;
         ctx.restore();
     }
 
