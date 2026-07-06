@@ -241,6 +241,26 @@ class Game {
         this.lives = 3;
         this.level = 1;
         this.gameState = STATE.WAITING;
+        this.difficulty = 'normal'; // 'easy', 'normal', 'hard', 'insane'
+        
+        // Level 3+ shifting walls and anomaly timers
+        this.shiftingWallTimer = 0;
+        this.shiftingWallState = false; // false = open (0), true = wall (1)
+        this.shiftingWallFlashing = false;
+        
+        this.superGhost = null;
+        this.superGhostTimer = 0;
+        this.superGhostSpawnTime = 0;
+        
+        this.immunityStar = null;
+        this.immunityStarSpawnTime = 0;
+        this.isPacmanImmune = false;
+        
+        this.duplicatorPellet = null;
+        this.duplicatorSpawnTime = 0;
+        this.duplicatorActiveTimer = 0;
+        this.extraGhosts = [];
+        this.extraPolicemen = [];
         
         this.grid = [];
         this.pacman = null;
@@ -301,6 +321,23 @@ class Game {
 
         this.pauseBtn.addEventListener('click', () => {
             this.togglePause();
+        });
+
+        const diffButtons = {
+            'easy': document.getElementById('diff-easy'),
+            'normal': document.getElementById('diff-normal'),
+            'hard': document.getElementById('diff-hard'),
+            'insane': document.getElementById('diff-insane')
+        };
+        Object.keys(diffButtons).forEach(key => {
+            const btn = diffButtons[key];
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    this.difficulty = key;
+                    Object.values(diffButtons).forEach(b => { if (b) b.classList.remove('active'); });
+                    btn.classList.add('active');
+                });
+            }
         });
 
         const resetConfigBtn = document.getElementById('reset-config-btn');
@@ -393,7 +430,11 @@ class Game {
 
     startGame() {
         this.score = 0;
-        this.lives = 3;
+        if (this.difficulty === 'easy') this.lives = 5;
+        else if (this.difficulty === 'normal') this.lives = 3;
+        else if (this.difficulty === 'hard') this.lives = 2;
+        else if (this.difficulty === 'insane') this.lives = 1;
+        
         this.level = 1;
         this.scoreEl.textContent = "000000";
         this.levelEl.textContent = "1";
@@ -404,6 +445,22 @@ class Game {
         this.floatingPoints = [];
 
         this.sound.playPowerUp();
+        
+        // Reset dynamic anomaly timers
+        this.shiftingWallTimer = 0;
+        this.shiftingWallState = false;
+        this.shiftingWallFlashing = false;
+        this.isPacmanImmune = false;
+        this.superGhost = null;
+        this.superGhostTimer = 0;
+        this.superGhostSpawnTime = 15000 + Math.random() * 30000;
+        this.immunityStar = null;
+        this.immunityStarSpawnTime = 10000 + Math.random() * 20000;
+        this.duplicatorPellet = null;
+        this.duplicatorSpawnTime = 20000 + Math.random() * 20000;
+        this.duplicatorActiveTimer = 0;
+        this.extraGhosts = [];
+        this.extraPolicemen = [];
         
         this.resetMap();
         this.spawnEntities();
@@ -426,6 +483,23 @@ class Game {
         this.floatingPoints = [];
 
         this.sound.playPowerUp();
+        
+        // Reset dynamic anomaly timers for next level
+        this.shiftingWallTimer = 0;
+        this.shiftingWallState = false;
+        this.shiftingWallFlashing = false;
+        this.isPacmanImmune = false;
+        this.superGhost = null;
+        this.superGhostTimer = 0;
+        this.superGhostSpawnTime = 15000 + Math.random() * 30000;
+        this.immunityStar = null;
+        this.immunityStarSpawnTime = 10000 + Math.random() * 20000;
+        this.duplicatorPellet = null;
+        this.duplicatorSpawnTime = 20000 + Math.random() * 20000;
+        this.duplicatorActiveTimer = 0;
+        this.extraGhosts = [];
+        this.extraPolicemen = [];
+        
         this.resetMap();
         this.spawnEntities();
         
@@ -444,7 +518,11 @@ class Game {
         this.pacman = new Pacman(15.5 * TILE_SIZE, 24.5 * TILE_SIZE);
         
         // Spawn 4 ghosts with level-scaled release delays
-        const delayMultiplier = Math.max(0.2, 1 - (this.level - 1) * 0.25);
+        let delayMultiplier = Math.max(0.2, 1 - (this.level - 1) * 0.25);
+        if (this.difficulty === 'easy') delayMultiplier *= 2;
+        else if (this.difficulty === 'hard') delayMultiplier *= 0.5;
+        else if (this.difficulty === 'insane') delayMultiplier *= 0.1;
+
         this.ghosts = [
             new Ghost(15.5 * TILE_SIZE, 10.5 * TILE_SIZE, 'red', DIR_LEFT, { x: 31, y: 0 }),       // Blinky (starts outside)
             new Ghost(15.5 * TILE_SIZE, 14.5 * TILE_SIZE, 'pink', DIR_UP, { x: 0, y: 0 }, 1000 * delayMultiplier),    // Pinky
@@ -516,9 +594,19 @@ class Game {
 
     respawnRound() {
         this.pacman.reset(15.5 * TILE_SIZE, 24.5 * TILE_SIZE);
+        this.isPacmanImmune = false;
+        this.duplicatorActiveTimer = 0;
+        this.extraGhosts = [];
+        this.extraPolicemen = [];
+        this.superGhost = null;
+        this.superGhostTimer = 0;
         
         // Reset ghosts to starting coordinates and delays
-        const delayMultiplier = Math.max(0.2, 1 - (this.level - 1) * 0.25);
+        let delayMultiplier = Math.max(0.2, 1 - (this.level - 1) * 0.25);
+        if (this.difficulty === 'easy') delayMultiplier *= 2;
+        else if (this.difficulty === 'hard') delayMultiplier *= 0.5;
+        else if (this.difficulty === 'insane') delayMultiplier *= 0.1;
+
         this.ghosts[0].reset(15.5 * TILE_SIZE, 10.5 * TILE_SIZE, DIR_LEFT, 0);
         this.ghosts[1].reset(15.5 * TILE_SIZE, 14.5 * TILE_SIZE, DIR_UP, 1000 * delayMultiplier);
         this.ghosts[2].reset(11.5 * TILE_SIZE, 14.5 * TILE_SIZE, DIR_UP, 3000 * delayMultiplier);
@@ -583,7 +671,15 @@ class Game {
 
     triggerPowerPellet() {
         const durations = [8000, 6000, 4000, 2000, 0];
-        const duration = durations[Math.min(this.level - 1, durations.length - 1)];
+        let duration = durations[Math.min(this.level - 1, durations.length - 1)];
+        
+        if (this.difficulty === 'easy') {
+            duration = duration * 1.5;
+        } else if (this.difficulty === 'hard') {
+            duration = duration * 0.7;
+        } else if (this.difficulty === 'insane') {
+            duration = 0;
+        }
         
         this.powerPelletTimer = duration;
         this.ghostsEatenMultiplier = 1;
@@ -593,9 +689,15 @@ class Game {
             this.ghosts.forEach(g => {
                 g.becomeFrightened();
             });
+            this.extraGhosts.forEach(g => {
+                g.becomeFrightened();
+            });
         } else {
-            // Level 5+: ghosts reverse direction immediately but do not turn blue/frightened
+            // Level 5+ / Insane: ghosts reverse direction immediately but do not turn blue/frightened
             this.ghosts.forEach(g => {
+                g.dir = { x: -g.dir.x, y: -g.dir.y, angle: g.dir.angle + Math.PI };
+            });
+            this.extraGhosts.forEach(g => {
                 g.dir = { x: -g.dir.x, y: -g.dir.y, angle: g.dir.angle + Math.PI };
             });
         }
@@ -631,12 +733,74 @@ class Game {
     }
 
     update(dt) {
+        // Update Shifting Maze timer (Level 3+)
+        if (this.level >= 3) {
+            this.shiftingWallTimer += dt;
+            this.shiftingWallFlashing = (this.shiftingWallTimer >= 13000); // Flash last 2 seconds
+            
+            if (this.shiftingWallTimer >= 15000) {
+                this.shiftingWallTimer = 0;
+                this.shiftingWallState = !this.shiftingWallState;
+                this.shiftingWallFlashing = false;
+                
+                // Toggle cells
+                const val = this.shiftingWallState ? 1 : 0;
+                const shiftCoords = [
+                    { r: 10, c: 12 },
+                    { r: 10, c: 19 },
+                    { r: 21, c: 12 },
+                    { r: 21, c: 19 }
+                ];
+                
+                shiftCoords.forEach(coord => {
+                    this.grid[coord.r][coord.c] = val;
+                });
+                
+                // If turning into walls, eject any entities caught in them
+                if (this.shiftingWallState) {
+                    const shiftEntityAway = (entity) => {
+                        if (!entity) return;
+                        const entGridX = Math.floor(entity.x / TILE_SIZE);
+                        const entGridY = Math.floor(entity.y / TILE_SIZE);
+                        
+                        const hits = shiftCoords.some(c => c.r === entGridY && c.c === entGridX);
+                        if (hits) {
+                            // Find nearby free cell
+                            const neighbors = [
+                                { r: entGridY - 1, c: entGridX },
+                                { r: entGridY + 1, c: entGridX },
+                                { r: entGridY, c: entGridX - 1 },
+                                { r: entGridY, c: entGridX + 1 }
+                            ];
+                            for (const n of neighbors) {
+                                if (n.r >= 0 && n.r < ROWS && n.c >= 0 && n.c < COLS) {
+                                    if (this.grid[n.r][n.c] !== 1 && this.grid[n.r][n.c] !== 4) {
+                                        entity.x = (n.c + 0.5) * TILE_SIZE;
+                                        entity.y = (n.r + 0.5) * TILE_SIZE;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    
+                    shiftEntityAway(this.pacman);
+                    if (this.policeman) shiftEntityAway(this.policeman);
+                    this.ghosts.forEach(g => shiftEntityAway(g));
+                    this.extraGhosts.forEach(g => shiftEntityAway(g));
+                    this.extraPolicemen.forEach(p => shiftEntityAway(p));
+                    if (this.superGhost) shiftEntityAway(this.superGhost);
+                }
+            }
+        }
+
         // Update power pellet timer
         if (this.powerPelletTimer > 0) {
             this.powerPelletTimer -= dt;
             if (this.powerPelletTimer <= 0) {
                 this.powerPelletTimer = 0;
                 this.ghosts.forEach(g => g.exitFrightened());
+                this.extraGhosts.forEach(g => g.exitFrightened());
             }
         }
 
@@ -671,8 +835,27 @@ class Game {
             }
         }
 
-        // Update Ghosts
-        this.ghosts.forEach(ghost => {
+        // Update Extra Policemen
+        this.extraPolicemen.forEach(officer => {
+            officer.update(this.grid);
+            const distToOfficer = Math.hypot(this.pacman.x - officer.x, this.pacman.y - officer.y);
+            if (distToOfficer < 10) {
+                if (this.policeEscortTimer <= 0) {
+                    this.sound.playPowerUp();
+                    this.floatingPoints.push({
+                        x: this.pacman.x,
+                        y: this.pacman.y,
+                        text: "PD ESCORT!",
+                        timer: 1200
+                    });
+                }
+                this.policeEscortTimer = 20000;
+            }
+        });
+
+        // Update Ghosts (Normal and Duplicated)
+        const activeGhosts = [...this.ghosts, ...this.extraGhosts];
+        activeGhosts.forEach(ghost => {
             // Update individual arrested state timers
             if (ghost.arrestedTimer > 0) {
                 ghost.arrestedTimer -= dt;
@@ -683,20 +866,23 @@ class Game {
 
             ghost.update(this.grid, this.pacman, dt);
             
-            // Collision between Policeman and Ghost -> Arrest Ghost!
-            if (this.policeman && !ghost.isEaten && ghost.arrestedTimer <= 0) {
-                const distToOfficer = Math.hypot(ghost.x - this.policeman.x, ghost.y - this.policeman.y);
-                if (distToOfficer < 10) {
-                    ghost.becomeArrested();
-                    this.sound.playEatGhost(); // Arrest sound effect
-                    this.floatingPoints.push({
-                        x: ghost.x,
-                        y: ghost.y,
-                        text: "ARRESTED!",
-                        timer: 1200
-                    });
+            // Collision between Policeman/Extra Policeman and Ghost -> Arrest Ghost!
+            const officers = [this.policeman, ...this.extraPolicemen].filter(Boolean);
+            officers.forEach(officer => {
+                if (!ghost.isEaten && ghost.arrestedTimer <= 0) {
+                    const distToOfficer = Math.hypot(ghost.x - officer.x, ghost.y - officer.y);
+                    if (distToOfficer < 10) {
+                        ghost.becomeArrested();
+                        this.sound.playEatGhost(); // Arrest sound effect
+                        this.floatingPoints.push({
+                            x: ghost.x,
+                            y: ghost.y,
+                            text: "ARRESTED!",
+                            timer: 1200
+                        });
+                    }
                 }
-            }
+            });
             
             // Check Collisions
             const dist = Math.hypot(this.pacman.x - ghost.x, this.pacman.y - ghost.y);
@@ -719,8 +905,10 @@ class Game {
 
                     this.ghostsEatenMultiplier *= 2;
                 } else if (!ghost.isEaten && ghost.arrestedTimer <= 0) {
-                    // Pac-Man hit! Only if Pac-man doesn't have police escort
-                    if (this.policeEscortTimer > 0) {
+                    // Pac-Man hit! Only if Pac-man doesn't have police escort or gold immunity
+                    if (this.isPacmanImmune) {
+                        // Pass through / ignore collision safely!
+                    } else if (this.policeEscortTimer > 0) {
                         // Grant immunity & Eat Ghost like power pellet!
                         this.sound.playEatGhost();
                         ghost.becomeEaten();
@@ -739,16 +927,180 @@ class Game {
             }
         });
 
+        // Update Super Ghost (Boss)
+        if (this.superGhost) {
+            this.superGhost.update(this.grid, this.pacman);
+            this.superGhostTimer -= dt;
+            if (this.superGhostTimer <= 0) {
+                this.superGhost = null;
+                this.floatingPoints.push({
+                    x: this.pacman.x,
+                    y: this.pacman.y,
+                    text: "BOSS DESPAWNED",
+                    timer: 1200
+                });
+            } else {
+                // Collision with Pac-man
+                const distToBoss = Math.hypot(this.pacman.x - this.superGhost.x, this.pacman.y - this.superGhost.y);
+                if (distToBoss < 10) {
+                    if (this.isPacmanImmune) {
+                        // Immune! Boss passes through
+                    } else {
+                        // Boss instantly kills Pacman, ignoring police escort!
+                        this.handleDeath();
+                    }
+                }
+            }
+        } else if (this.level >= 3 && this.superGhostSpawnTime > 0) {
+            this.superGhostSpawnTime -= dt;
+            if (this.superGhostSpawnTime <= 0) {
+                const spawnTile = this.findRandomCorridorTile();
+                if (spawnTile) {
+                    this.superGhost = new SuperGhost((spawnTile.c + 0.5) * TILE_SIZE, (spawnTile.r + 0.5) * TILE_SIZE);
+                    this.superGhostTimer = 30000; // 30 seconds
+                    this.floatingPoints.push({
+                        x: this.superGhost.x,
+                        y: this.superGhost.y,
+                        text: "BOSS SPAWNED!",
+                        timer: 1500
+                    });
+                }
+            }
+        }
+
+        // Update Immunity Star (⭐)
+        if (this.immunityStar && this.immunityStar.active) {
+            this.immunityStar.timer -= dt;
+            if (this.immunityStar.timer <= 0) {
+                this.immunityStar.active = false;
+            } else {
+                const distToStar = Math.hypot(this.pacman.x - this.immunityStar.x, this.pacman.y - this.immunityStar.y);
+                if (distToStar < 12) {
+                    this.isPacmanImmune = true;
+                    this.immunityStar.active = false;
+                    this.addScore(100);
+                    this.sound.playPowerUp();
+                    this.floatingPoints.push({
+                        x: this.pacman.x,
+                        y: this.pacman.y,
+                        text: "IMMUNITY STAR!",
+                        timer: 1500
+                    });
+                }
+            }
+        } else if (this.level >= 3 && this.immunityStarSpawnTime > 0) {
+            this.immunityStarSpawnTime -= dt;
+            if (this.immunityStarSpawnTime <= 0) {
+                const spawnTile = this.findRandomCorridorTile();
+                if (spawnTile) {
+                    this.immunityStar = {
+                        x: (spawnTile.c + 0.5) * TILE_SIZE,
+                        y: (spawnTile.r + 0.5) * TILE_SIZE,
+                        timer: 10000,
+                        active: true
+                    };
+                    this.floatingPoints.push({
+                        x: this.immunityStar.x,
+                        y: this.immunityStar.y,
+                        text: "⭐ APPEARED!",
+                        timer: 1200
+                    });
+                }
+            }
+        }
+
+        // Update Duplication Pellet (♊)
+        if (this.duplicatorPellet && this.duplicatorPellet.active) {
+            this.duplicatorPellet.timer -= dt;
+            if (this.duplicatorPellet.timer <= 0) {
+                this.duplicatorPellet.active = false;
+            } else {
+                const distToDup = Math.hypot(this.pacman.x - this.duplicatorPellet.x, this.pacman.y - this.duplicatorPellet.y);
+                if (distToDup < 12) {
+                    this.duplicatorPellet.active = false;
+                    this.addScore(100);
+                    this.sound.playPowerUp();
+                    this.floatingPoints.push({
+                        x: this.pacman.x,
+                        y: this.pacman.y,
+                        text: "CHAOS INCOMING!",
+                        timer: 1500
+                    });
+
+                    // Duplicate ghosts
+                    this.extraGhosts = this.ghosts.map(g => {
+                        const clone = new Ghost(g.x, g.y, g.color, g.dir, g.scatterTile);
+                        clone.speed = g.speed;
+                        clone.isFrightened = g.isFrightened;
+                        clone.frightenedTimer = g.frightenedTimer;
+                        return clone;
+                    });
+                    
+                    // Duplicate policeman
+                    if (this.policeman) {
+                        this.extraPolicemen = [new Policeman(this.policeman.x, this.policeman.y)];
+                    }
+
+                    this.duplicatorActiveTimer = 30000; // 30 seconds
+                }
+            }
+        } else if (this.level >= 3 && this.duplicatorSpawnTime > 0) {
+            this.duplicatorSpawnTime -= dt;
+            if (this.duplicatorSpawnTime <= 0) {
+                const spawnTile = this.findRandomCorridorTile();
+                if (spawnTile) {
+                    this.duplicatorPellet = {
+                        x: (spawnTile.c + 0.5) * TILE_SIZE,
+                        y: (spawnTile.r + 0.5) * TILE_SIZE,
+                        timer: 10000,
+                        active: true
+                    };
+                    this.floatingPoints.push({
+                        x: this.duplicatorPellet.x,
+                        y: this.duplicatorPellet.y,
+                        text: "♊ APPEARED!",
+                        timer: 1200
+                    });
+                }
+            }
+        }
+
+        // Update active duplication timer
+        if (this.duplicatorActiveTimer > 0) {
+            this.duplicatorActiveTimer -= dt;
+            if (this.duplicatorActiveTimer <= 0) {
+                this.duplicatorActiveTimer = 0;
+                this.extraGhosts = [];
+                this.extraPolicemen = [];
+                this.floatingPoints.push({
+                    x: this.pacman.x,
+                    y: this.pacman.y,
+                    text: "DUPLICATES CLEARED",
+                    timer: 1200
+                });
+            }
+        }
+
         // Update floaters
         this.floatingPoints.forEach(f => f.timer -= dt);
         this.floatingPoints = this.floatingPoints.filter(f => f.timer > 0);
 
         // Update HUD status text with police escort timer info
         if (this.gameState === STATE.PLAYING) {
-            if (this.policeEscortTimer > 0) {
+            if (this.isPacmanImmune) {
+                this.statusEl.textContent = "⭐ GOLD IMMUNITY";
+                this.statusEl.className = "hud-value neon-yellow";
+            } else if (this.policeEscortTimer > 0) {
                 const sec = Math.ceil(this.policeEscortTimer / 1000);
                 this.statusEl.textContent = `🚨 SIREN: ${sec}S`;
                 this.statusEl.className = "hud-value " + (Math.floor(performance.now() / 250) % 2 === 0 ? "neon-pink" : "neon-blue");
+            } else if (this.superGhost) {
+                this.statusEl.textContent = "👿 BOSS ACTIVE!";
+                this.statusEl.className = "hud-value neon-red";
+            } else if (this.duplicatorActiveTimer > 0) {
+                const sec = Math.ceil(this.duplicatorActiveTimer / 1000);
+                this.statusEl.textContent = `♊ CHAOS: ${sec}S`;
+                this.statusEl.className = "hud-value neon-pink";
             } else {
                 this.statusEl.textContent = "PLAYING";
                 this.statusEl.className = "hud-value neon-green";
@@ -756,6 +1108,23 @@ class Game {
         }
 
         this.checkWinCondition();
+    }
+
+    findRandomCorridorTile() {
+        const candidates = [];
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                if (this.grid[r][c] !== 1 && this.grid[r][c] !== 4) {
+                    if (r < 12 || r > 16 || c < 10 || c > 22) {
+                        candidates.push({ r, c });
+                    }
+                }
+            }
+        }
+        if (candidates.length > 0) {
+            return candidates[Math.floor(Math.random() * candidates.length)];
+        }
+        return null;
     }
 
     draw() {
@@ -769,6 +1138,27 @@ class Game {
         this.pacman.draw(this.ctx);
         if (this.policeman) this.policeman.draw(this.ctx);
         this.ghosts.forEach(g => g.draw(this.ctx));
+        this.extraGhosts.forEach(g => g.draw(this.ctx));
+        this.extraPolicemen.forEach(p => p.draw(this.ctx));
+        if (this.superGhost) this.superGhost.draw(this.ctx);
+
+        // Draw Special Pellets
+        if (this.immunityStar && this.immunityStar.active) {
+            this.ctx.fillStyle = '#ffff00';
+            this.ctx.shadowColor = '#ffff00';
+            this.ctx.shadowBlur = 8;
+            this.ctx.font = '14px "Press Start 2P"';
+            this.ctx.fillText("⭐", this.immunityStar.x - 7, this.immunityStar.y + 5);
+            this.ctx.shadowBlur = 0;
+        }
+        if (this.duplicatorPellet && this.duplicatorPellet.active) {
+            this.ctx.fillStyle = '#ff00ff';
+            this.ctx.shadowColor = '#ff00ff';
+            this.ctx.shadowBlur = 8;
+            this.ctx.font = '14px "Press Start 2P"';
+            this.ctx.fillText("♊", this.duplicatorPellet.x - 7, this.duplicatorPellet.y + 5);
+            this.ctx.shadowBlur = 0;
+        }
 
         // Draw floating score tags
         this.floatingPoints.forEach(f => {
@@ -792,18 +1182,37 @@ class Game {
                 const x = c * TILE_SIZE;
                 const y = r * TILE_SIZE;
 
+                const isShiftingCell = (r === 10 && c === 12) || (r === 10 && c === 19) || (r === 21 && c === 12) || (r === 21 && c === 19);
+                if (isShiftingCell && this.level >= 3) {
+                    if (this.shiftingWallFlashing) {
+                        const pulse = Math.floor(performance.now() / 150) % 2 === 0;
+                        this.ctx.fillStyle = pulse ? 'rgba(255, 0, 0, 0.65)' : 'rgba(255, 0, 0, 0.15)';
+                        this.ctx.fillRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                    }
+                    if (val === 1) {
+                        this.ctx.strokeStyle = '#ff3300';
+                        this.ctx.shadowColor = '#ff3300';
+                        this.ctx.shadowBlur = 6;
+                        this.ctx.beginPath();
+                        this.ctx.rect(x + 3, y + 3, TILE_SIZE - 6, TILE_SIZE - 6);
+                        this.ctx.stroke();
+                        this.ctx.shadowBlur = 0;
+                        continue;
+                    } else if (!this.shiftingWallFlashing) {
+                        this.ctx.strokeStyle = 'rgba(255, 50, 50, 0.15)';
+                        this.ctx.beginPath();
+                        this.ctx.rect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+                        this.ctx.stroke();
+                        continue;
+                    }
+                }
+
                 if (val === 1) {
                     // Draw neon glowing walls
                     this.ctx.strokeStyle = color;
                     this.ctx.shadowColor = shadow;
                     this.ctx.shadowBlur = 6;
                     
-                    // Determine if neighbor walls exist to join them nicely
-                    const wUp = r > 0 && this.grid[r-1][c] === 1;
-                    const wDown = r < ROWS-1 && this.grid[r+1][c] === 1;
-                    const wLeft = c > 0 && this.grid[r][c-1] === 1;
-                    const wRight = c < COLS-1 && this.grid[r][c+1] === 1;
-
                     this.ctx.beginPath();
                     this.ctx.rect(x + 3, y + 3, TILE_SIZE - 6, TILE_SIZE - 6);
                     this.ctx.stroke();
@@ -1207,8 +1616,14 @@ class Pacman {
         let glowColor = '#ffff00';
         let glowSize = 6;
         
+        const isImmune = window.gameEngine ? window.gameEngine.isPacmanImmune : false;
         const escortTime = window.gameEngine ? window.gameEngine.policeEscortTimer : 0;
-        if (escortTime > 0) {
+        
+        if (isImmune) {
+            bodyColor = '#ffd700'; // Gold
+            glowColor = '#ffd700';
+            glowSize = 14;
+        } else if (escortTime > 0) {
             // Flash red and blue every 150ms
             const isRed = Math.floor(escortTime / 150) % 2 === 0;
             bodyColor = isRed ? '#ff003c' : '#00f3ff';
@@ -1747,6 +2162,114 @@ class Ghost {
         ctx.beginPath();
         ctx.arc(this.x + eyeOffset + dx, this.y - 1 + dy, this.isFrightened ? 1 : 1.2, 0, Math.PI * 2);
         ctx.fill();
+    }
+}
+
+// SuperGhost (Boss Ghost) Entity Definition
+class SuperGhost {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.dir = DIR_LEFT;
+        this.speed = 2;
+        this.color = 'white';
+    }
+
+    update(grid, pacman) {
+        // Warp logic (independent of grid alignment and reference comparisons to prevent getting stuck off-screen)
+        if (this.x < 0.5 * TILE_SIZE && this.dir.x === -1) {
+            this.x = (COLS - 0.5) * TILE_SIZE;
+            return;
+        } else if (this.x > (COLS - 0.5) * TILE_SIZE && this.dir.x === 1) {
+            this.x = 0.5 * TILE_SIZE;
+            return;
+        }
+
+        // Standard Grid Alignment check
+        if ((this.x - TILE_SIZE/2) % TILE_SIZE === 0 && (this.y - TILE_SIZE/2) % TILE_SIZE === 0) {
+            const gridX = Math.floor(this.x / TILE_SIZE);
+            const gridY = Math.floor(this.y / TILE_SIZE);
+
+            // Targeted pathfinding towards pacman
+            const pacGridX = Math.floor(pacman.x / TILE_SIZE);
+            const pacGridY = Math.floor(pacman.y / TILE_SIZE);
+            const target = { x: pacGridX, y: pacGridY };
+
+            const directions = [DIR_UP, DIR_LEFT, DIR_DOWN, DIR_RIGHT];
+            let bestDir = null;
+            let minDistance = Infinity;
+
+            directions.forEach(d => {
+                if (d.x === -this.dir.x && d.y === -this.dir.y) return; // cannot reverse
+
+                const nextX = gridX + d.x;
+                const nextY = gridY + d.y;
+
+                if (nextY >= 0 && nextY < ROWS && nextX >= 0 && nextX < COLS) {
+                    const cellVal = grid[nextY][nextX];
+                    if (cellVal !== 1 && cellVal !== 4) { // cannot enter walls or gates
+                        const dist = Math.hypot(nextX - target.x, nextY - target.y);
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            bestDir = d;
+                        }
+                    }
+                }
+            });
+
+            if (bestDir) {
+                this.dir = bestDir;
+            }
+        }
+
+        this.x += this.dir.x * this.speed;
+        this.y += this.dir.y * this.speed;
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.beginPath();
+
+        // White flashing body with bright red neon shadow glow
+        const pulse = Math.sin(performance.now() / 80) * 3 + 6;
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#ff0000';
+        ctx.shadowBlur = pulse;
+
+        const radius = 8;
+        const bottomY = this.y + 8;
+        ctx.arc(this.x, this.y, radius, Math.PI, 0, false);
+        
+        const w1 = Math.sin(performance.now() / 60) * 1.5;
+        ctx.lineTo(this.x + 8, bottomY + w1);
+        ctx.lineTo(this.x + 4, bottomY - 2 + w1);
+        ctx.lineTo(this.x, bottomY + w1);
+        ctx.lineTo(this.x - 4, bottomY - 2 + w1);
+        ctx.lineTo(this.x - 8, bottomY + w1);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Draw angry red eyes
+        const eyeOffset = 3.5;
+        const dx = this.dir.x * 1.5;
+        const dy = this.dir.y * 1.5;
+
+        // White/red sclera
+        ctx.fillStyle = '#ff003c';
+        ctx.beginPath();
+        ctx.arc(this.x - eyeOffset, this.y - 1, 2.5, 0, Math.PI * 2);
+        ctx.arc(this.x + eyeOffset, this.y - 1, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupil
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(this.x - eyeOffset + dx, this.y - 1 + dy, 1, 0, Math.PI * 2);
+        ctx.arc(this.x + eyeOffset + dx, this.y - 1 + dy, 1, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
     }
 }
 
