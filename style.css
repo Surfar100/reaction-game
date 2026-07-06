@@ -42,9 +42,160 @@ body {
     justify-content: center;
     align-items: flex-start;
     gap: 30px;
-    max-width: 1020px;
+    max-width: 1280px;
     width: 100%;
     margin: 0 auto;
+}
+
+/* LEFT SIDEBAR: Developer profile panel */
+.profile-panel {
+    flex: 1 1 300px;
+    max-width: 330px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+}
+
+.profile-avatar-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-frame {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+    overflow: hidden;
+    background: #06060f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.avatar-frame svg {
+    width: 50px;
+    height: 50px;
+    fill: #e0e0ff;
+    filter: drop-shadow(0 0 4px var(--neon-blue));
+}
+
+.profile-title {
+    font-family: var(--font-title);
+    font-size: 0.8rem;
+    color: #ffffff;
+    text-shadow: 0 0 4px var(--neon-blue);
+    margin-bottom: 2px;
+}
+
+.profile-subtitle {
+    font-family: var(--font-arcade);
+    font-size: 0.45rem;
+    color: #8080a0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bio-text {
+    color: #a0a0c0;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    text-align: center;
+    background: rgba(0,0,0,0.25);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #16162d;
+}
+
+/* Skills Stat Bars */
+.skills-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.skill-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.skill-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-hud);
+    font-size: 0.45rem;
+    color: #8080a0;
+}
+
+.skill-bar-bg {
+    width: 100%;
+    height: 8px;
+    background-color: #06060f;
+    border: 1px solid #1a1a3a;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.skill-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.bar-blue {
+    background-color: var(--neon-blue);
+    color: var(--neon-blue);
+}
+
+.bar-pink {
+    background-color: var(--neon-pink);
+    color: var(--neon-pink);
+}
+
+.bar-yellow {
+    background-color: var(--neon-yellow);
+    color: var(--neon-yellow);
+}
+
+.bar-green {
+    background-color: var(--neon-green);
+    color: var(--neon-green);
+}
+
+.social-links {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.social-btn {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    padding: 8px 0;
+    font-family: var(--font-hud);
+    font-size: 0.48rem;
+    border: 1.5px solid #16162d;
+    background-color: #06060f;
+    border-radius: 6px;
+    color: #8080a0;
+    transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+    color: #ffffff;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+    background-color: rgba(0, 243, 255, 0.05);
 }
 
 /* Cabinet Container */
@@ -874,14 +1025,14 @@ body {
 }
 
 /* Desktop side-by-side adaptive layout */
-@media (max-width: 1020px) {
+@media (max-width: 1240px) {
     .arcade-wrapper {
         flex-direction: column;
         align-items: center;
         max-width: 580px;
         gap: 20px;
     }
-    .arcade-container, .side-panel {
+    .arcade-container, .side-panel, .profile-panel {
         flex: 1 1 auto;
         width: 100%;
     }
@@ -909,4 +1060,51 @@ body {
     .hud-value {
         font-size: 0.72rem;
     }
+}
+
+/* Difficulty Selector Overlay Styles */
+.difficulty-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.diff-label {
+    font-family: var(--font-hud);
+    font-size: 0.72rem;
+    color: #8080a0;
+    letter-spacing: 0.5px;
+}
+
+.diff-options {
+    display: flex;
+    gap: 6px;
+}
+
+.diff-btn {
+    background: #0f0f1f;
+    color: #8080a0;
+    border: 1px solid #23234b;
+    padding: 6px 12px;
+    font-family: var(--font-hud);
+    font-size: 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.diff-btn:hover {
+    color: #ffffff;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 6px rgba(0, 243, 255, 0.2);
+}
+
+.diff-btn.active {
+    background: rgba(0, 243, 255, 0.15);
+    color: var(--neon-blue);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+    font-weight: bold;
 }
