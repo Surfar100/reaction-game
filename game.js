@@ -296,6 +296,7 @@ class Game {
         this.highScoreEl = document.getElementById('high-score');
         this.levelEl = document.getElementById('level');
         this.statusEl = document.getElementById('status-text');
+        this.difficultyEl = document.getElementById('hud-difficulty');
         this.livesContainer = document.getElementById('lives-container');
         this.muteBtn = document.getElementById('mute-btn');
         this.pauseBtn = document.getElementById('pause-btn');
@@ -336,6 +337,14 @@ class Game {
                     this.difficulty = key;
                     Object.values(diffButtons).forEach(b => { if (b) b.classList.remove('active'); });
                     btn.classList.add('active');
+                    if (this.difficultyEl) {
+                        this.difficultyEl.textContent = key.toUpperCase();
+                        let colorClass = 'neon-green';
+                        if (key === 'easy') colorClass = 'neon-blue';
+                        else if (key === 'hard') colorClass = 'neon-yellow';
+                        else if (key === 'insane') colorClass = 'neon-pink';
+                        this.difficultyEl.className = `hud-value ${colorClass}`;
+                    }
                 });
             }
         });
@@ -434,6 +443,15 @@ class Game {
         else if (this.difficulty === 'normal') this.lives = 3;
         else if (this.difficulty === 'hard') this.lives = 2;
         else if (this.difficulty === 'insane') this.lives = 1;
+
+        if (this.difficultyEl) {
+            this.difficultyEl.textContent = this.difficulty.toUpperCase();
+            let colorClass = 'neon-green';
+            if (this.difficulty === 'easy') colorClass = 'neon-blue';
+            else if (this.difficulty === 'hard') colorClass = 'neon-yellow';
+            else if (this.difficulty === 'insane') colorClass = 'neon-pink';
+            this.difficultyEl.className = `hud-value ${colorClass}`;
+        }
         
         this.level = 1;
         this.scoreEl.textContent = "000000";
@@ -1787,7 +1805,14 @@ class Ghost {
         this.x = x;
         this.y = y;
         this.dir = startDir;
-        this.speed = 2; // matching integer step
+        
+        this.baseSpeed = 2;
+        if (window.gameEngine) {
+            if (window.gameEngine.difficulty === 'easy') this.baseSpeed = 1;
+            else if (window.gameEngine.difficulty === 'insane') this.baseSpeed = 4;
+        }
+        this.speed = this.baseSpeed;
+        
         this.startDelay = startDelay;
         
         this.isFrightened = false;
@@ -1801,7 +1826,7 @@ class Ghost {
     becomeFrightened() {
         if (!this.isEaten && this.arrestedTimer <= 0) {
             this.isFrightened = true;
-            this.speed = 1; // slow down in frightened mode
+            this.speed = Math.max(1, Math.floor(this.baseSpeed / 2)); // slow down in frightened mode
             // reverse direction immediately on entering frightened mode
             this.dir = { x: -this.dir.x, y: -this.dir.y, angle: this.dir.angle + Math.PI };
         }
@@ -1810,14 +1835,14 @@ class Ghost {
     exitFrightened() {
         this.isFrightened = false;
         if (!this.isEaten && this.arrestedTimer <= 0) {
-            this.speed = 2;
+            this.speed = this.baseSpeed;
         }
     }
 
     becomeEaten() {
         this.isFrightened = false;
         this.isEaten = true;
-        this.speed = 4; // return extremely fast to base!
+        this.speed = Math.max(4, this.baseSpeed * 2); // return extremely fast to base!
     }
 
     becomeArrested() {
@@ -1832,7 +1857,7 @@ class Ghost {
 
     exitArrested() {
         this.arrestedTimer = 0;
-        this.speed = 2;
+        this.speed = this.baseSpeed;
         this.startDelay = 1000; // Rest in house 1 second before exiting
     }
 
@@ -1883,7 +1908,7 @@ class Ghost {
                 this.y = homeTargetY;
                 this.isEaten = false;
                 this.inHouse = true;
-                this.speed = 2;
+                this.speed = this.baseSpeed;
                 this.startDelay = 2000; // sit in house 2 seconds before returning to play
                 return;
             }
@@ -1897,7 +1922,8 @@ class Ghost {
                     if (grid[r][c] === 2 || grid[r][c] === 3) dots++;
                 }
             }
-            this.speed = (dots < 30) ? 4 : 2;
+            const triggerDots = (window.gameEngine && window.gameEngine.difficulty === 'hard') ? 50 : 30;
+            this.speed = (dots < triggerDots) ? (this.baseSpeed * 2) : this.baseSpeed;
         }
 
         // Warp logic (independent of grid alignment and reference comparisons to prevent getting stuck off-screen)
@@ -2171,7 +2197,12 @@ class SuperGhost {
         this.x = x;
         this.y = y;
         this.dir = DIR_LEFT;
-        this.speed = 2;
+        this.baseSpeed = 2;
+        if (window.gameEngine) {
+            if (window.gameEngine.difficulty === 'easy') this.baseSpeed = 1;
+            else if (window.gameEngine.difficulty === 'insane') this.baseSpeed = 4;
+        }
+        this.speed = this.baseSpeed;
         this.color = 'white';
     }
 
