@@ -394,9 +394,13 @@ class Ball {
         this.vel = new Vector(0, 0);
         this.r = 7;
         this.trail = [];
+        this.prevPos = new Vector(x, y);
     }
 
     update(gravity, dt) {
+        // Save previous position to resolve boundary directions
+        this.prevPos = new Vector(this.pos.x, this.pos.y);
+
         // Record trail
         this.trail.push(new Vector(this.pos.x, this.pos.y));
         if (this.trail.length > 8) this.trail.shift();
@@ -843,8 +847,16 @@ class Game {
             const dist = distVector.mag();
 
             if (dist < ball.r) {
+                // Determine normal pointing back inside
+                let norm = distVector.norm();
+                if (ball.prevPos) {
+                    const toPrev = ball.prevPos.sub(cp);
+                    if (toPrev.mag() > 0.01) {
+                        norm = toPrev.norm();
+                    }
+                }
+
                 // Colliding! Push out
-                const norm = distVector.norm();
                 ball.pos = cp.add(norm.mult(ball.r));
 
                 // Reflect velocity
@@ -953,7 +965,13 @@ class Game {
             const dist = distVector.mag();
 
             if (dist < ball.r + flipper.thickness / 2) {
-                const norm = distVector.norm();
+                let norm = distVector.norm();
+                if (ball.prevPos) {
+                    const toPrev = ball.prevPos.sub(cp);
+                    if (toPrev.mag() > 0.01) {
+                        norm = toPrev.norm();
+                    }
+                }
                 ball.pos = cp.add(norm.mult(ball.r + flipper.thickness / 2));
 
                 const normalVelocity = ball.vel.dot(norm);
