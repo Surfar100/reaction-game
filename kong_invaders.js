@@ -1,6 +1,22 @@
 // Kong Invaders - 80s Fusion Game Engine
 // Donkey Kong + Space Invaders + Frogger Mashup
 
+// Polyfill for CanvasRenderingContext2D.prototype.roundRect for backward compatibility
+if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+    };
+}
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -372,7 +388,9 @@ class Game {
         this.spawnCars();
         
         this.state = STATE.PLAYING;
-        this.lastTime = performance.now();
+        const timeNow = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        this.lastTime = timeNow;
+        this.lastBrickSpawn = timeNow;
         
         requestAnimationFrame((t) => this.gameLoop(t));
     }
@@ -506,7 +524,7 @@ class Game {
             this.startBtn.style.display = 'inline-block';
             this.state = STATE.PLAYING;
             this.pauseBtn.textContent = "⏸ Pause";
-            this.lastTime = performance.now();
+            this.lastTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
             requestAnimationFrame((t) => this.gameLoop(t));
         }
     }
@@ -514,8 +532,9 @@ class Game {
     gameLoop(currentTime) {
         if (this.state !== STATE.PLAYING) return;
         
-        const dt = currentTime - this.lastTime;
-        this.lastTime = currentTime;
+        const t = currentTime || ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now());
+        const dt = t - this.lastTime;
+        this.lastTime = t;
         
         this.update(dt);
         this.draw();
@@ -768,7 +787,7 @@ class Game {
 
     updateBricks(dt) {
         // Spawning bricks by Kong
-        const timeNow = performance.now();
+        const timeNow = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
         if (timeNow - this.lastBrickSpawn > this.difficulty.brickRate) {
             this.lastBrickSpawn = timeNow;
             this.bricks.push({
