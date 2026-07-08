@@ -414,10 +414,11 @@ class Game {
     updateLivesDisplay() {
         this.livesContainer.innerHTML = '';
         for (let i = 0; i < this.lives; i++) {
-            // Neon Yellow Pac-Man SVGs
+            // Neon Yellow System Core SVGs
             this.livesContainer.innerHTML += `
                 <svg viewBox="0 0 20 20">
-                    <path d="M10,0 A10,10 0 1,1 9.9,0 L10,10 Z" />
+                    <circle cx="10" cy="10" r="7" stroke="var(--neon-yellow)" stroke-width="1.8" fill="none" />
+                    <circle cx="10" cy="10" r="3" fill="var(--neon-yellow)" />
                 </svg>
             `;
         }
@@ -427,7 +428,7 @@ class Game {
         // Draw standard blue walls and yellow dots on startup screen
         this.resetMap();
         this.drawMap();
-        this.drawOverlayScreen("READY PLAYER ONE", "INSERT COIN TO START", "INSERT COIN");
+        this.drawOverlayScreen("INITIALIZE GRID RUN", "READY FOR CORE INJECTION", "INITIALIZE RUN");
     }
 
     drawOverlayScreen(title, msg, btnText) {
@@ -651,7 +652,7 @@ class Game {
 
         this.submitScore();
 
-        this.drawOverlayScreen("GAME OVER", `YOUR FINAL SCORE: ${this.score}`, "INSERT COIN");
+        this.drawOverlayScreen("CONNECTION LOST", `INTEGRITY FAULT | RAW DATA: ${this.score}`, "REINITIALIZE RUN");
     }
 
     checkWinCondition() {
@@ -681,7 +682,7 @@ class Game {
                 this.pacman.draw(this.ctx);
                 if (flashCount >= 8) {
                     clearInterval(flashInterval);
-                    this.drawOverlayScreen("VICTORY!", "LEVEL COMPLETE", "NEXT ROUND");
+                    this.drawOverlayScreen("SECTOR SECURED", "NODE PROTOCOL DOWNLOADED", "NEXT SECTOR");
                 }
             }, 180);
         }
@@ -979,7 +980,7 @@ class Game {
                     this.floatingPoints.push({
                         x: this.superGhost.x,
                         y: this.superGhost.y,
-                        text: "BOSS SPAWNED!",
+                        text: "SYSADMIN ONLINE!",
                         timer: 1500
                     });
                 }
@@ -1001,7 +1002,7 @@ class Game {
                     this.floatingPoints.push({
                         x: this.pacman.x,
                         y: this.pacman.y,
-                        text: "IMMUNITY STAR!",
+                        text: "ROOT BYPASS RUNNING!",
                         timer: 1500
                     });
                 }
@@ -1020,7 +1021,7 @@ class Game {
                     this.floatingPoints.push({
                         x: this.immunityStar.x,
                         y: this.immunityStar.y,
-                        text: "⭐ APPEARED!",
+                        text: "⭐ ROOT BYPASS SECTOR!",
                         timer: 1200
                     });
                 }
@@ -1041,7 +1042,7 @@ class Game {
                     this.floatingPoints.push({
                         x: this.pacman.x,
                         y: this.pacman.y,
-                        text: "CHAOS INCOMING!",
+                        text: "BUFFER OVERFLOW!",
                         timer: 1500
                     });
 
@@ -1076,7 +1077,7 @@ class Game {
                     this.floatingPoints.push({
                         x: this.duplicatorPellet.x,
                         y: this.duplicatorPellet.y,
-                        text: "♊ APPEARED!",
+                        text: "♊ OVERFLOW MODULE!",
                         timer: 1200
                     });
                 }
@@ -1093,7 +1094,7 @@ class Game {
                 this.floatingPoints.push({
                     x: this.pacman.x,
                     y: this.pacman.y,
-                    text: "DUPLICATES CLEARED",
+                    text: "BUFFER CLEARED",
                     timer: 1200
                 });
             }
@@ -1106,21 +1107,21 @@ class Game {
         // Update HUD status text with police escort timer info
         if (this.gameState === STATE.PLAYING) {
             if (this.isPacmanImmune) {
-                this.statusEl.textContent = "⭐ GOLD IMMUNITY";
+                this.statusEl.textContent = "⭐ ROOT ACCESS";
                 this.statusEl.className = "hud-value neon-yellow";
             } else if (this.policeEscortTimer > 0) {
                 const sec = Math.ceil(this.policeEscortTimer / 1000);
-                this.statusEl.textContent = `🚨 SIREN: ${sec}S`;
+                this.statusEl.textContent = `🔌 OVERCLOCK: ${sec}S`;
                 this.statusEl.className = "hud-value " + (Math.floor(performance.now() / 250) % 2 === 0 ? "neon-pink" : "neon-blue");
             } else if (this.superGhost) {
-                this.statusEl.textContent = "👿 BOSS ACTIVE!";
+                this.statusEl.textContent = "🔒 LOCKOUT ACTIVE!";
                 this.statusEl.className = "hud-value neon-red";
             } else if (this.duplicatorActiveTimer > 0) {
                 const sec = Math.ceil(this.duplicatorActiveTimer / 1000);
-                this.statusEl.textContent = `♊ CHAOS: ${sec}S`;
+                this.statusEl.textContent = `♊ OVERFLOW: ${sec}S`;
                 this.statusEl.className = "hud-value neon-pink";
             } else {
-                this.statusEl.textContent = "PLAYING";
+                this.statusEl.textContent = "LINK ACTIVE";
                 this.statusEl.className = "hud-value neon-green";
             }
         }
@@ -1162,20 +1163,46 @@ class Game {
 
         // Draw Special Pellets
         if (this.immunityStar && this.immunityStar.active) {
-            this.ctx.fillStyle = '#ffff00';
-            this.ctx.shadowColor = '#ffff00';
-            this.ctx.shadowBlur = 8;
-            this.ctx.font = '14px "Press Start 2P"';
-            this.ctx.fillText("⭐", this.immunityStar.x - 7, this.immunityStar.y + 5);
-            this.ctx.shadowBlur = 0;
+            this.ctx.save();
+            this.ctx.fillStyle = '#ffd700'; // Gold
+            this.ctx.shadowColor = '#ffd700';
+            this.ctx.shadowBlur = 10;
+            
+            // Draw a diamond-shaped chip with golden pathways
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.immunityStar.x, this.immunityStar.y - 6);
+            this.ctx.lineTo(this.immunityStar.x + 6, this.immunityStar.y);
+            this.ctx.lineTo(this.immunityStar.x, this.immunityStar.y + 6);
+            this.ctx.lineTo(this.immunityStar.x - 6, this.immunityStar.y);
+            this.ctx.closePath();
+            this.ctx.fill();
+
+            // Inner cyan node
+            this.ctx.fillStyle = '#00f3ff';
+            this.ctx.beginPath();
+            this.ctx.arc(this.immunityStar.x, this.immunityStar.y, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.restore();
         }
         if (this.duplicatorPellet && this.duplicatorPellet.active) {
-            this.ctx.fillStyle = '#ff00ff';
-            this.ctx.shadowColor = '#ff00ff';
-            this.ctx.shadowBlur = 8;
-            this.ctx.font = '14px "Press Start 2P"';
-            this.ctx.fillText("♊", this.duplicatorPellet.x - 7, this.duplicatorPellet.y + 5);
-            this.ctx.shadowBlur = 0;
+            this.ctx.save();
+            const flashColor = Math.floor(performance.now() / 150) % 2 === 0 ? '#ff00ff' : '#00ffff';
+            this.ctx.fillStyle = flashColor;
+            this.ctx.shadowColor = flashColor;
+            this.ctx.shadowBlur = 10;
+
+            // Draw two small squares side by side (Split Byte)
+            this.ctx.fillRect(this.duplicatorPellet.x - 5, this.duplicatorPellet.y - 3, 4, 6);
+            this.ctx.fillRect(this.duplicatorPellet.x + 1, this.duplicatorPellet.y - 3, 4, 6);
+            
+            // Connecting line
+            this.ctx.strokeStyle = flashColor;
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.duplicatorPellet.x - 1, this.duplicatorPellet.y);
+            this.ctx.lineTo(this.duplicatorPellet.x + 1, this.duplicatorPellet.y);
+            this.ctx.stroke();
+            this.ctx.restore();
         }
 
         // Draw floating score tags
@@ -1237,24 +1264,23 @@ class Game {
                     this.ctx.shadowBlur = 0; // reset
                 } 
                 else if (val === 2) {
-                    // Pac-Dot
-                    this.ctx.fillStyle = '#ffb8ae';
-                    this.ctx.shadowColor = '#ffb8ae';
+                    // Byte packet - small glowing square data block
+                    this.ctx.fillStyle = '#00ff66';
+                    this.ctx.shadowColor = '#00ff66';
                     this.ctx.shadowBlur = 4;
-                    this.ctx.beginPath();
-                    this.ctx.arc(x + TILE_SIZE/2, y + TILE_SIZE/2, 2.5, 0, Math.PI * 2);
-                    this.ctx.fill();
+                    this.ctx.fillRect(x + TILE_SIZE/2 - 1.5, y + TILE_SIZE/2 - 1.5, 3, 3);
                     this.ctx.shadowBlur = 0;
                 } 
                 else if (val === 3) {
-                    // Pulsing Power Pellet
-                    const pulse = Math.sin(performance.now() / 100) * 1.5 + 4.5;
-                    this.ctx.fillStyle = '#ffff00';
-                    this.ctx.shadowColor = '#ffff00';
-                    this.ctx.shadowBlur = pulse * 1.5;
-                    this.ctx.beginPath();
-                    this.ctx.arc(x + TILE_SIZE/2, y + TILE_SIZE/2, pulse, 0, Math.PI * 2);
-                    this.ctx.fill();
+                    // Overclock Module - small card/floppy disk shape
+                    const flash = Math.floor(performance.now() / 200) % 2 === 0;
+                    this.ctx.fillStyle = flash ? '#ff00ea' : '#00f3ff';
+                    this.ctx.shadowColor = flash ? '#ff00ea' : '#00f3ff';
+                    this.ctx.shadowBlur = 8;
+                    this.ctx.fillRect(x + 4, y + 3, 8, 10);
+                    // Draw mini label line on chip
+                    this.ctx.fillStyle = '#000';
+                    this.ctx.fillRect(x + 5, y + 8, 6, 2);
                     this.ctx.shadowBlur = 0;
                 }
                 else if (val === 4) {
@@ -1653,40 +1679,50 @@ class Pacman {
         ctx.fillStyle = bodyColor;
         ctx.shadowColor = glowColor;
         ctx.shadowBlur = glowSize;
+        
+        // Draw spinning central target core (Data Core)
         ctx.beginPath();
-        
-        const startMouth = this.dir.angle + this.mouthAngle * Math.PI;
-        const endMouth = this.dir.angle + (2 - this.mouthAngle) * Math.PI;
-        
-        ctx.arc(this.x, this.y, 8, startMouth, endMouth);
-        ctx.lineTo(this.x, this.y);
+        ctx.arc(this.x, this.y, 4.5, 0, Math.PI * 2);
         ctx.fill();
+
+        // Draw rotating target crosshair arcs
+        ctx.strokeStyle = bodyColor;
+        ctx.lineWidth = 1.6;
+        const rot = (performance.now() / 250) % (Math.PI * 2);
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 8, rot, rot + Math.PI * 0.5);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 8, rot + Math.PI, rot + Math.PI * 1.5);
+        ctx.stroke();
+
         ctx.restore();
     }
 
     drawDeath(ctx, frame) {
-        ctx.fillStyle = '#ffff00';
-        ctx.shadowColor = '#ffff00';
+        ctx.save();
+        ctx.fillStyle = '#ff003c'; // Warning red
+        ctx.strokeStyle = '#ff003c';
+        ctx.shadowColor = '#ff003c';
         ctx.shadowBlur = 8;
-        ctx.beginPath();
         
-        // Make mouth widen until it collapses into nothingness
-        const fraction = frame / 45;
-        const startMouth = this.dir.angle + fraction * Math.PI;
-        const endMouth = this.dir.angle + (2 - fraction) * Math.PI;
-
+        const fraction = frame / 60; // 0 to 1
         if (fraction < 1.0) {
-            ctx.arc(this.x, this.y, 8 * (1 - fraction * 0.5), startMouth, endMouth);
-            ctx.lineTo(this.x, this.y);
-            ctx.fill();
-        } else {
-            // Draw particle burst
-            ctx.strokeStyle = '#ffff00';
+            // Core collapses
             ctx.beginPath();
-            ctx.arc(this.x, this.y, (frame - 45) * 1.5, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, Math.max(0, 4.5 * (1 - fraction)), 0, Math.PI * 2);
+            ctx.fill();
+
+            // Outer ring expands and fades out
+            ctx.globalAlpha = 1 - fraction;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 8 + fraction * 14, 0, Math.PI * 2);
             ctx.stroke();
         }
-        ctx.shadowBlur = 0;
+        ctx.restore();
     }
 }
 
@@ -1754,41 +1790,34 @@ class Policeman {
 
     draw(ctx) {
         ctx.save();
-        
-        // Draw blue uniform body
-        ctx.fillStyle = '#1e3cff';
-        ctx.shadowColor = '#1e3cff';
-        ctx.shadowBlur = 6;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 8, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw Police cap
-        ctx.fillStyle = '#060a33';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y - 4, 6, Math.PI, 0);
-        ctx.fill();
-        
-        // Cap Visor
-        ctx.fillStyle = '#000';
-        ctx.fillRect(this.x - 7, this.y - 5, 14, 2);
+        ctx.translate(this.x, this.y);
 
-        // Flashing siren light on head
-        const flash = Math.floor(this.badgeFlicker) % 2 === 0;
-        ctx.fillStyle = flash ? '#00f3ff' : '#ff007f';
-        ctx.shadowColor = flash ? '#00f3ff' : '#ff007f';
-        ctx.shadowBlur = 10;
+        // Draw double glowing green hexagon (Security Shield)
+        ctx.strokeStyle = '#00ff66';
+        ctx.shadowColor = '#00ff66';
+        ctx.shadowBlur = 8;
+        ctx.lineWidth = 1.5;
+
+        const drawHex = (r) => {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * Math.PI) / 3;
+                ctx.lineTo(r * Math.cos(angle), r * Math.sin(angle));
+            }
+            ctx.closePath();
+            ctx.stroke();
+        };
+
+        drawHex(8);
+        drawHex(5);
+
+        // Draw rotating scanner dome light
+        const rot = (performance.now() / 150) % (Math.PI * 2);
+        ctx.fillStyle = '#00ff66';
         ctx.beginPath();
-        ctx.arc(this.x, this.y - 9, 3.5, 0, Math.PI * 2);
+        ctx.arc(3 * Math.cos(rot), 3 * Math.sin(rot), 1.8, 0, Math.PI * 2);
         ctx.fill();
 
-        // Golden Badge
-        ctx.fillStyle = '#ffff00';
-        ctx.shadowBlur = 0;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
-        ctx.fill();
-        
         ctx.restore();
     }
 }
@@ -2068,17 +2097,12 @@ class Ghost {
     }
 
     draw(ctx) {
-        ctx.save();
-        ctx.beginPath();
-        
-        // Define colors
         let bodyColor = '#000';
         let glowColor = '#000';
         
         if (this.isEaten) {
-            // Just eyes returning home
+            // Draw a flashing decompiled tracking cursor returning home
             this.drawEyes(ctx);
-            ctx.restore();
             return;
         }
 
@@ -2091,7 +2115,6 @@ class Ghost {
         } else if (this.arrestedTimer > 0) {
             bodyColor = '#002699';
             glowColor = '#00f3ff';
-            ctx.globalAlpha = 0.55;
         } else {
             if (this.color === 'red') { bodyColor = '#ff003c'; glowColor = '#ff003c'; }
             if (this.color === 'pink') { bodyColor = '#ff00ea'; glowColor = '#ff00ea'; }
@@ -2099,47 +2122,53 @@ class Ghost {
             if (this.color === 'orange') { bodyColor = '#ff9900'; glowColor = '#ff9900'; }
         }
 
+        ctx.save();
+        if (this.arrestedTimer > 0) {
+            ctx.globalAlpha = 0.55;
+        }
+        
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.dir.angle);
+
         ctx.fillStyle = bodyColor;
         ctx.shadowColor = glowColor;
         ctx.shadowBlur = 6;
 
-        // Render Ghost Body (Round top head, wavy skirt footer)
-        const radius = 8;
-        const bottomY = this.y + 8;
-        
-        ctx.arc(this.x, this.y, radius, Math.PI, 0, false);
-        
-        // Wave pattern
-        const w1 = Math.sin(performance.now() / 60) * 1.5;
-        ctx.lineTo(this.x + 8, bottomY + w1);
-        ctx.lineTo(this.x + 4, bottomY - 2 + w1);
-        ctx.lineTo(this.x, bottomY + w1);
-        ctx.lineTo(this.x - 4, bottomY - 2 + w1);
-        ctx.lineTo(this.x - 8, bottomY + w1);
-        
+        // Draw Sentinel glider drone (facing right relative to angle 0)
+        ctx.beginPath();
+        ctx.moveTo(8, 0);       // Nose
+        ctx.lineTo(-4, -6);     // Left wingtip
+        ctx.lineTo(-2, -2);     // Core backing
+        ctx.lineTo(-2, 2);
+        ctx.lineTo(-4, 6);      // Right wingtip
         ctx.closePath();
         ctx.fill();
-        ctx.shadowBlur = 0; // reset
 
-        // Draw eyes
-        this.drawEyes(ctx);
+        // Draw visor / cockpit light
+        ctx.fillStyle = this.isFrightened ? '#ffb8ae' : '#ffffff';
+        ctx.shadowColor = this.isFrightened ? '#ffb8ae' : '#ffffff';
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.ellipse(3, 0, 1.2, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
 
-        // Draw mouth for frightened ghosts
-        if (this.isFrightened) {
-            ctx.strokeStyle = '#ffb8ae';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            // Frightened wiggle mouth
-            ctx.moveTo(this.x - 4, this.y + 4);
-            ctx.lineTo(this.x - 2, this.y + 2);
-            ctx.lineTo(this.x, this.y + 4);
-            ctx.lineTo(this.x + 2, this.y + 2);
-            ctx.lineTo(this.x + 4, this.y + 4);
-            ctx.stroke();
-        }
+        // Draw rocket thruster trail
+        const flamePulse = Math.sin(performance.now() / 40) * 2.5 + 4;
+        ctx.fillStyle = this.isFrightened ? 'rgba(0, 243, 255, 0.6)' : 'rgba(255, 51, 0, 0.8)';
+        ctx.shadowColor = this.isFrightened ? '#00f3ff' : '#ff3300';
+        ctx.shadowBlur = flamePulse;
+        ctx.beginPath();
+        ctx.moveTo(-2, -2);
+        ctx.lineTo(-2 - flamePulse, 0);
+        ctx.lineTo(-2, 2);
+        ctx.closePath();
+        ctx.fill();
 
-        // Draw padlock over arrested ghost
+        ctx.restore();
+
+        // Draw padlock over quarantined/arrested sentinel
         if (this.arrestedTimer > 0) {
+            ctx.save();
             ctx.globalAlpha = 1.0;
             
             // Draw Padlock shackle (U-shape)
@@ -2156,38 +2185,21 @@ class Ghost {
             // Small keyhole
             ctx.fillStyle = '#000';
             ctx.fillRect(this.x - 1, this.y + 1, 2, 3);
+            ctx.restore();
         }
-
-        ctx.globalAlpha = 1.0;
-        ctx.restore();
     }
 
     drawEyes(ctx) {
-        const eyeOffset = 3.5;
-        const dx = this.dir.x * 1.5;
-        const dy = this.dir.y * 1.5;
-
-        // Left Eye
-        ctx.fillStyle = '#ffffff';
+        // Red warning beacon tracking back to security base
+        ctx.save();
+        const pulse = Math.sin(performance.now() / 50) * 2 + 4;
+        ctx.fillStyle = '#ff003c';
+        ctx.shadowColor = '#ff003c';
+        ctx.shadowBlur = pulse;
         ctx.beginPath();
-        ctx.arc(this.x - eyeOffset, this.y - 1, 2.5, 0, Math.PI * 2);
+        ctx.rect(this.x - 2.5, this.y - 2.5, 5, 5);
         ctx.fill();
-        
-        ctx.fillStyle = this.isFrightened ? '#ffb8ae' : '#0022ff';
-        ctx.beginPath();
-        ctx.arc(this.x - eyeOffset + dx, this.y - 1 + dy, this.isFrightened ? 1 : 1.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Right Eye
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(this.x + eyeOffset, this.y - 1, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.fillStyle = this.isFrightened ? '#ffb8ae' : '#0022ff';
-        ctx.beginPath();
-        ctx.arc(this.x + eyeOffset + dx, this.y - 1 + dy, this.isFrightened ? 1 : 1.2, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.restore();
     }
 }
 
@@ -2259,46 +2271,27 @@ class SuperGhost {
 
     draw(ctx) {
         ctx.save();
-        ctx.beginPath();
-
-        // White flashing body with bright red neon shadow glow
-        const pulse = Math.sin(performance.now() / 80) * 3 + 6;
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = '#ff0000';
-        ctx.shadowBlur = pulse;
-
-        const radius = 8;
-        const bottomY = this.y + 8;
-        ctx.arc(this.x, this.y, radius, Math.PI, 0, false);
         
-        const w1 = Math.sin(performance.now() / 60) * 1.5;
-        ctx.lineTo(this.x + 8, bottomY + w1);
-        ctx.lineTo(this.x + 4, bottomY - 2 + w1);
-        ctx.lineTo(this.x, bottomY + w1);
-        ctx.lineTo(this.x - 4, bottomY - 2 + w1);
-        ctx.lineTo(this.x - 8, bottomY + w1);
-        ctx.closePath();
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        // Padlock body with glowing red outline (SysAdmin / Core Wipe)
+        const pulse = Math.sin(performance.now() / 80) * 3 + 8;
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#ff003c';
+        ctx.shadowColor = '#ff003c';
+        ctx.shadowBlur = pulse;
+        ctx.lineWidth = 2;
 
-        // Draw angry red eyes
-        const eyeOffset = 3.5;
-        const dx = this.dir.x * 1.5;
-        const dy = this.dir.y * 1.5;
+        // Draw shackle
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - 3, 4.5, Math.PI, 0);
+        ctx.stroke();
 
-        // White/red sclera
+        // Draw padlock body square
+        ctx.fillRect(this.x - 6, this.y - 1, 12, 10);
+        
+        // Draw threat exclamation mark inside padlock body
         ctx.fillStyle = '#ff003c';
-        ctx.beginPath();
-        ctx.arc(this.x - eyeOffset, this.y - 1, 2.5, 0, Math.PI * 2);
-        ctx.arc(this.x + eyeOffset, this.y - 1, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Pupil
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.arc(this.x - eyeOffset + dx, this.y - 1 + dy, 1, 0, Math.PI * 2);
-        ctx.arc(this.x + eyeOffset + dx, this.y - 1 + dy, 1, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(this.x - 1, this.y + 1, 2, 4);
+        ctx.fillRect(this.x - 1, this.y + 6, 2, 2);
 
         ctx.restore();
     }
