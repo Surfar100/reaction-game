@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Cyberpunk Pinball | Neon Arcade</title>
+    <!-- Google Fonts for Retro Styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;800&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="pinball.css">
+    <!-- Supabase JS Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Retro CRT scanlines overlay -->
+    <div class="scanlines"></div>
+
+    <!-- Main side-by-side display wrapper -->
+    <div class="arcade-wrapper">
+        <!-- LEFT: About Retro / Developer Profile Panel -->
+        <div class="profile-panel side-panel">
+            <div class="dashboard-card" style="padding: 20px;">
+                <div class="profile-avatar-card">
+                    <div class="avatar-frame" style="border-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue);">
+                        <!-- Retro Gamepad Icon -->
+                        <svg viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M21,6H3A2,2 0 0,0 1,8V16A2,2 0 0,0 3,18H21A2,2 0 0,0 23,16V8A2,2 0 0,0 21,6M6,15A3,3 0 1,1 9,12A3,3 0 0,1 6,15M18,11A1,1 0 1,1 17,12A1,1 0 0,1 18,11M20,13A1,1 0 1,1 19,14A1,1 0 0,1 20,13Z" />
+                        </svg>
+                    </div>
+                    <h2 class="profile-title">NEON RETRO</h2>
+                    <span class="profile-subtitle" style="color: var(--neon-blue);">80S REGENERATION</span>
+                </div>
+                
+                <div class="bio-text" style="margin-top: 14px; text-align: left; font-size: 0.72rem; line-height: 1.4;">
+                    <p style="margin-bottom: 10px; color: #fff;"><strong>Cyberball</strong> is a modern cybernetic reconstruction of the legendary 80s arcade pinball genre.</p>
+                    <p style="color: #a8a8cf;">Our mission under the <strong>Old Men Coding</strong> banner is to regenerate the greatest gameplay formulas of the 1980s—reimagining them with vibrant neon aesthetics, synthwave audio, and custom tactical twists to offer a fresh challenge.</p>
+                </div>
+            </div>
+
+            <!-- Coming Soon Card -->
+            <div class="dashboard-card" style="padding: 16px;">
+                <div class="card-header" style="text-align: center; margin-bottom: 8px;">
+                    <h3 class="neon-pink" style="font-family: var(--font-title); font-size: 0.58rem; letter-spacing: 0.5px;">COMING SOON</h3>
+                </div>
+                <p style="font-size: 0.7rem; color: #fff; margin-bottom: 4px; font-weight: bold; text-align: center;">🕹️ Kong Climb</p>
+                <p style="font-size: 0.68rem; color: #8080a0; text-align: center; line-height: 1.35;">A hybrid vertical platforms-climber fused with space shooter defense systems and hover highways.</p>
+            </div>
+
+            <!-- Support Card -->
+            <div class="dashboard-card" style="padding: 16px; text-align: center;">
+                <div class="card-header" style="margin-bottom: 8px;">
+                    <h3 class="neon-yellow-text" style="font-family: var(--font-title); font-size: 0.58rem; letter-spacing: 0.5px;">⚡ SUPPORT THE PORTAL</h3>
+                </div>
+                <p style="font-size: 0.68rem; color: #a8a8cf; line-height: 1.35; margin-bottom: 12px;">Support the development of new retro game cabinets by buying the developer a coffee.</p>
+                <a href="https://ko-fi.com/oldmencoding" target="_blank" class="arcade-btn" style="text-decoration: none; display: inline-block; font-size: 0.58rem; padding: 10px 0; width: 100%; box-shadow: 0 4px 0 #6d0034;">☕ Buy Mike a Coffee</a>
+            </div>
+
+            <!-- Disclaimer footer -->
+            <div style="font-size: 0.62rem; color: #505075; line-height: 1.35; text-align: center; padding: 8px 6px; border-top: 1px solid #1a1a3a;">
+                <strong style="color: #6a6a9f; display: block; margin-bottom: 4px; font-family: var(--font-hud); font-size: 0.5rem; letter-spacing: 0.5px;">OLD MEN CODING</strong>
+                Handcrafting and evolving classic retro gaming formulas with neon visual overhauls.
+            </div>
+        </div>
+
+        <!-- LEFT: Retro Arcade Cabinet Panel -->
+        <div class="arcade-container">
+            <!-- Neon Header Title -->
+            <header class="arcade-header">
+                <h1 class="neon-text" data-text="CYBERBALL">CYBERBALL</h1>
+                <p class="neon-subtitle">NEON PINBALL EDITION</p>
+                <div style="margin-top: 8px;">
+                    <a href="index.html" class="footer-link" style="text-decoration: none; padding: 4px 10px; background: rgba(255, 0, 127, 0.1); border: 1px solid var(--neon-pink); border-radius: 4px; font-size: 0.7rem; font-family: var(--font-hud); letter-spacing: 0.5px; color: var(--neon-pink); display: inline-block;">🕹️ BACK TO LOBBY</a>
+                </div>
+            </header>
+
+            <!-- Main Cabinet Body -->
+            <div class="cabinet-body">
+                <!-- Glass Screen Bezel -->
+                <div class="screen-bezel">
+                    <!-- Retro CRT Scanline Overlay -->
+                    <div class="crt-overlay"></div>
+                    
+                    <!-- Game Header HUD -->
+                    <div class="hud-container">
+                        <div class="hud-item score-board">
+                            <span class="hud-label">SCORE</span>
+                            <span id="score" class="hud-value neon-green">000000</span>
+                        </div>
+                        <div class="hud-item high-score-board">
+                            <span class="hud-label">HIGH SCORE</span>
+                            <span id="high-score" class="hud-value neon-pink">000000</span>
+                        </div>
+                        <div class="hud-item lives-board">
+                            <span class="hud-label">BALLS</span>
+                            <div id="lives-container" class="lives-icons">
+                                <!-- JS will inject ball icons here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screen Content (Canvas & Overlays) -->
+                    <div class="screen-content">
+                        <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+                        <!-- Game Screen Overlay (Start/Pause/GameOver) -->
+                        <div id="overlay" class="game-overlay active">
+                            <div class="overlay-card">
+                                <h2 id="overlay-title" class="neon-yellow">READY PLAYER ONE</h2>
+                                <p id="overlay-message">HOLD SPACE TO LAUNCH BALL<br>A / D OR SHIFT TO FLIP</p>
+                                <button id="start-btn" class="arcade-btn">LAUNCH GAME</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Game Footer HUD -->
+                    <div class="hud-footer">
+                        <span class="hud-footer-label">MULTIPLIER: <span id="multiplier" class="neon-yellow-text">x1</span></span>
+                        <span class="hud-footer-label" id="status-text" style="color: var(--neon-blue);">READY</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lower Cabinet Controller Panel -->
+            <div class="cabinet-lower-panel">
+                <div class="joystick-graphics">
+                    <div class="joystick-base">
+                        <div class="joystick-ball"></div>
+                    </div>
+                    <div class="action-buttons">
+                        <div class="action-btn-red"></div>
+                        <div class="action-btn-blue"></div>
+                    </div>
+                </div>
+                <div class="cabinet-instructions">
+                    <h3>CABINET CONTROLS:</h3>
+                    <ul>
+                        <li><span class="key-cap">Space</span> (Hold & Release) - Launcher Plunger</li>
+                        <li><span class="key-cap">A</span> / <span class="key-cap">←</span> / <span class="key-cap">Left Shift</span> - Left Flipper</li>
+                        <li><span class="key-cap">D</span> / <span class="key-cap">→</span> / <span class="key-cap">Right Shift</span> - Right Flipper</li>
+                        <li><span class="key-cap">Esc</span> / <span class="key-cap">P</span> - Pause Machine</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- System controls (Mute/Pause buttons) -->
+            <div class="system-controls">
+                <button id="mute-btn" class="system-btn">🔊 Mute</button>
+                <button id="pause-btn" class="system-btn" disabled>⏸ Pause</button>
+            </div>
+        </div>
+
+        <!-- RIGHT: Arcade Dashboard Panel (Leaderboard & Auth) -->
+        <div class="side-panel">
+            <!-- Database Connection Status Badge -->
+            <div class="status-panel">
+                <span class="status-title">DATABASE CABINET:</span>
+                <span id="db-status" class="status-indicator offline">CONNECTING...</span>
+            </div>
+
+            <!-- Auth Dashboard Card -->
+            <div class="dashboard-card auth-card">
+                <div class="tab-headers">
+                    <button id="toggle-login-btn" class="tab-btn active">PLAYER LOGIN</button>
+                    <button id="toggle-register-btn" class="tab-btn">REGISTER NEW PLAYER</button>
+                </div>
+
+                <div class="tab-body">
+                    <!-- Form Container (Handles Login and Signup) -->
+                    <div id="auth-logged-out" class="auth-section">
+                        <form id="auth-form" class="auth-form">
+                            <div class="input-group" id="username-group" style="display: none;">
+                                <label for="auth-username">PLAYER NAME (USERNAME)</label>
+                                <input type="text" id="auth-username" placeholder="ENTER ARCADE INITIALS" autocomplete="off">
+                            </div>
+                            <div class="input-group">
+                                <label for="auth-email">EMAIL ADDRESS</label>
+                                <input type="email" id="auth-email" required placeholder="name@email.com" autocomplete="email">
+                            </div>
+                            <div class="input-group">
+                                <label for="auth-password">PASSWORD</label>
+                                <input type="password" id="auth-password" required placeholder="••••••••" autocomplete="current-password">
+                            </div>
+                            <button type="submit" class="arcade-btn" style="width: 100%; margin-top: 10px;">SUBMIT PROFILE</button>
+                        </form>
+                        <div id="auth-error-msg" class="auth-error"></div>
+                    </div>
+
+                    <!-- Profile Screen (Visible when logged in) -->
+                    <div id="auth-logged-in" class="auth-section" style="display: none;">
+                        <div class="profile-dashboard">
+                            <div class="profile-info">
+                                <span class="profile-label">CURRENT PLAYER:</span>
+                                <span id="player-username" class="profile-value neon-yellow-text">PLAYER</span>
+                            </div>
+                            <div class="profile-info">
+                                <span class="profile-label">PERSONAL BEST:</span>
+                                <span id="player-pb" class="profile-value neon-green">000000</span>
+                            </div>
+                            <button id="logout-btn" class="arcade-btn btn-danger" style="margin-top: 14px; width: 100%;">LOG OUT PROFILE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global High Scores Card -->
+            <div class="dashboard-card leaderboard-card">
+                <div class="card-header">
+                    <h2 class="neon-yellow-text">GLOBAL HALL OF FAME</h2>
+                    <span class="card-subtitle">TOP 10 PINBALL MULTIPLIER SCORES</span>
+                </div>
+                <div class="card-body">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">RANK</th>
+                                <th style="width: 50%;">PLAYER NAME</th>
+                                <th style="width: 30%;">SCORE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <tr><td colspan="3" class="loading-text">LOADING SCORES...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel Footer -->
+            <div class="panel-footer">
+                <button id="reset-config-btn" class="footer-link">🔧 Configure Custom Database</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Setup Configuration Modal -->
+    <div id="setup-modal" class="setup-overlay">
+        <div class="setup-card">
+            <h2 class="neon-yellow-text">CONNECT TO SUPABASE</h2>
+            <p>Connect your own Supabase instance to store global high scores and enable account registration.</p>
+            
+            <form id="setup-form" class="setup-form">
+                <div class="input-group">
+                    <label for="setup-url">SUPABASE URL</label>
+                    <input type="url" id="setup-url" required placeholder="https://your-project-id.supabase.co" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label for="setup-key">SUPABASE ANON KEY</label>
+                    <input type="text" id="setup-key" required placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." autocomplete="off">
+                </div>
+                
+                <div class="setup-instructions">
+                    <h4>How to get keys:</h4>
+                    <ol>
+                        <li>Log in to your <strong>Supabase Dashboard</strong>.</li>
+                        <li>Select your project, go to <strong>Project Settings</strong> &gt; <strong>API</strong>.</li>
+                        <li>Copy the <strong>Project URL</strong> and the <strong>anon public API key</strong>.</li>
+                    </ol>
+                </div>
+                
+                <button type="submit" class="arcade-btn">SAVE & CONNECT</button>
+                
+                <div style="display: flex; gap: 10px; width: 100%; justify-content: center; margin-top: 6px;">
+                    <button type="button" id="use-default-btn" class="arcade-btn" style="flex: 1; background: rgba(0, 243, 255, 0.15); border-color: var(--neon-blue); color: #fff; font-size: 0.7rem; padding: 10px 0;">RESET TO DEFAULT</button>
+                    <button type="button" id="close-setup-btn" class="arcade-btn" style="flex: 1; background: rgba(255, 0, 127, 0.15); border-color: var(--neon-pink); color: #fff; font-size: 0.7rem; padding: 10px 0;">CANCEL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Web Application Logic -->
+    <script src="pinball.js"></script>
+</body>
+</html>

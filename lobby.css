@@ -1,0 +1,372 @@
+/* Neon Arcade Lobby Style Rules */
+:root {
+    --neon-blue: #00f3ff;
+    --neon-pink: #ff007f;
+    --neon-yellow: #ffff00;
+    --neon-green: #00ff66;
+    --bg-dark: #080812;
+    --bg-card: #131326;
+    --font-title: 'Orbitron', sans-serif;
+    --font-arcade: 'Press Start 2P', monospace;
+    --font-hud: 'Share Tech Mono', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: #ffffff;
+    font-family: var(--font-hud);
+    font-size: 16px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* CRT overlay effect */
+.crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 6px 100%;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.lobby-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Header styling */
+.lobby-header {
+    text-align: center;
+    border-bottom: 3px double #1c1c3a;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+.neon-text {
+    font-family: var(--font-title);
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 5px #fff, 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.neon-subtitle {
+    font-family: var(--font-hud);
+    font-size: 0.95rem;
+    letter-spacing: 4px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 5px var(--neon-pink);
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+/* Content Columns Layout */
+.lobby-content {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+    .lobby-content {
+        flex-direction: column;
+    }
+    .profile-column, .cabinets-column {
+        width: 100% !important;
+    }
+}
+
+.profile-column {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cabinets-column {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.section-title {
+    font-family: var(--font-title);
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    color: var(--neon-green);
+    text-shadow: 0 0 5px var(--neon-green);
+    border-left: 4px solid var(--neon-green);
+    padding-left: 10px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+/* Terminal Cards */
+.terminal-card {
+    background-color: var(--bg-card);
+    border: 2px solid #1c1c3a;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+.terminal-header {
+    background: #111122;
+    padding: 8px 12px;
+    border-bottom: 2px solid #1c1c3a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.terminal-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.terminal-dot.red { background-color: #ff3b30; }
+.terminal-dot.yellow { background-color: #ffcc00; }
+.terminal-dot.green { background-color: #4cd964; }
+
+.terminal-title {
+    font-family: var(--font-hud);
+    font-size: 0.72rem;
+    color: #7070a0;
+    margin-left: 6px;
+    letter-spacing: 1px;
+}
+
+.terminal-body {
+    padding: 24px;
+}
+
+.bio-greeting {
+    font-family: var(--font-title);
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 4px;
+    letter-spacing: 1.5px;
+}
+
+.bio-accent {
+    font-size: 0.95rem;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 3px var(--neon-yellow);
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.terminal-text-block p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #c0c0e0;
+    margin-bottom: 16px;
+}
+
+.terminal-text-block p:last-child {
+    margin-bottom: 0;
+}
+
+/* Feedback Box */
+.feedback-card {
+    border-color: #2c1a3f;
+}
+
+.feedback-card .terminal-header {
+    background: #181126;
+    border-bottom: 2px solid #2c1a3f;
+}
+
+.feedback-desc {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #a090b0;
+    margin-bottom: 20px;
+}
+
+.feedback-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.signature {
+    font-family: var(--font-arcade);
+    font-size: 0.78rem;
+    color: var(--neon-pink);
+    text-shadow: 0 0 3px var(--neon-pink);
+}
+
+.contact-button {
+    font-family: var(--font-title);
+    font-size: 0.78rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #fff;
+    background: rgba(255, 0, 127, 0.1);
+    border: 1.5px solid var(--neon-pink);
+    border-radius: 4px;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 4px rgba(255, 0, 127, 0.3);
+}
+
+.contact-button:hover {
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+    transform: translateY(-1px);
+}
+
+/* Cabinets Grid styling */
+.cabinets-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.cabinet-card {
+    background-color: var(--bg-card);
+    border: 3px solid #1c1c3a;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.cabinet-card:hover {
+    transform: translateY(-3px);
+}
+
+.runner-card:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
+.pinball-card:hover {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
+}
+
+.cabinet-screen {
+    background-color: #030308;
+    border: 2px solid #111122;
+    border-radius: 5px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.cabinet-screen-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.game-logo {
+    font-family: var(--font-arcade);
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+}
+
+.runner-logo {
+    color: var(--neon-blue);
+    text-shadow: 0 0 8px var(--neon-blue);
+}
+
+.pinball-logo {
+    color: var(--neon-pink);
+    text-shadow: 0 0 8px var(--neon-pink);
+}
+
+.game-version {
+    font-family: var(--font-hud);
+    font-size: 0.72rem;
+    color: var(--neon-yellow);
+}
+
+.game-desc {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: #8888aa;
+    margin-top: 4px;
+}
+
+.cabinet-controls {
+    display: flex;
+    justify-content: center;
+}
+
+.play-button {
+    width: 100%;
+    font-family: var(--font-arcade);
+    font-size: 0.78rem;
+    text-align: center;
+    padding: 14px 0;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.runner-glow {
+    background-color: rgba(0, 243, 255, 0.08);
+    border-color: var(--neon-blue);
+    color: #fff;
+    box-shadow: 0 4px 0 rgba(0, 243, 255, 0.3);
+}
+
+.runner-glow:hover {
+    background-color: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-blue);
+    font-weight: bold;
+}
+
+.pinball-glow {
+    background-color: rgba(255, 0, 127, 0.08);
+    border-color: var(--neon-pink);
+    color: #fff;
+    box-shadow: 0 4px 0 rgba(255, 0, 127, 0.3);
+}
+
+.pinball-glow:hover {
+    background-color: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-pink);
+    font-weight: bold;
+}
+
+/* Footer rules */
+.lobby-footer {
+    text-align: center;
+    border-top: 1px solid #16162d;
+    padding-top: 20px;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    color: #505075;
+}
