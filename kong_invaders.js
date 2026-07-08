@@ -1,20 +1,17 @@
 // Kong Invaders - 80s Fusion Game Engine
 // Donkey Kong + Space Invaders + Frogger Mashup
 
-// Polyfill for CanvasRenderingContext2D.prototype.roundRect for backward compatibility
-if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-        if (w < 2 * r) r = w / 2;
-        if (h < 2 * r) r = h / 2;
-        this.beginPath();
-        this.moveTo(x + r, y);
-        this.arcTo(x + w, y, x + w, y + h, r);
-        this.arcTo(x + w, y + h, x, y + h, r);
-        this.arcTo(x, y + h, x, y, r);
-        this.arcTo(x, y, x + w, y, r);
-        this.closePath();
-        return this;
-    };
+// Standalone helper to draw rounded rectangles without altering native prototypes
+function drawRoundRect(ctx, x, y, w, h, r) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
 }
 
 const canvas = document.getElementById('gameCanvas');
@@ -55,7 +52,16 @@ class SoundSystem {
 
     init() {
         if (!this.ctx) {
-            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+                try {
+                    this.ctx = new AudioContextClass();
+                } catch (e) {
+                    console.warn("Could not create AudioContext:", e);
+                }
+            } else {
+                console.warn("Web Audio API is not supported in this browser.");
+            }
         }
     }
 
@@ -929,8 +935,7 @@ class Game {
             ctx.fillStyle = '#ff007f';
             ctx.shadowColor = '#ff007f';
             ctx.shadowBlur = 8;
-            ctx.beginPath();
-            ctx.roundRect(car.pos.x, car.pos.y, car.width, car.height, 4);
+            drawRoundRect(ctx, car.pos.x, car.pos.y, car.width, car.height, 4);
             ctx.fill();
             
             // Windshield shine
@@ -992,8 +997,7 @@ class Game {
             ctx.lineWidth = 1.5;
             ctx.shadowColor = brick.isDeflected ? '#00ff66' : '#ffff00';
             ctx.shadowBlur = 8;
-            ctx.beginPath();
-            ctx.roundRect(brick.pos.x, brick.pos.y, brick.width, brick.height, 2);
+            drawRoundRect(ctx, brick.pos.x, brick.pos.y, brick.width, brick.height, 2);
             ctx.fill();
             ctx.stroke();
             ctx.restore();
@@ -1054,8 +1058,7 @@ class Game {
             
             // Torso/Jumpsuit
             ctx.fillStyle = '#00ff66';
-            ctx.beginPath();
-            ctx.roundRect(player.pos.x + 2, player.pos.y + 12, player.width - 4, 8, 2);
+            drawRoundRect(ctx, player.pos.x + 2, player.pos.y + 12, player.width - 4, 8, 2);
             ctx.fill();
             
             // Jetpack / blaster nozzle
