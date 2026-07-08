@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kong Invaders - Old Men Coding</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Retro CRT scanlines overlay -->
+    <div class="scanlines"></div>
+
+    <!-- Main side-by-side display wrapper -->
+    <div class="arcade-wrapper">
+        <!-- LEFT: About Retro / Developer Profile Panel -->
+        <div class="profile-panel side-panel">
+            <div class="dashboard-card" style="padding: 20px;">
+                <div class="profile-avatar-card">
+                    <div class="avatar-frame" style="border-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue);">
+                        <!-- Retro Gamepad Icon -->
+                        <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: var(--neon-blue);">
+                            <path d="M21,6H3A2,2 0 0,0 1,8V16A2,2 0 0,0 3,18H21A2,2 0 0,0 23,16V8A2,2 0 0,0 21,6M6,15A3,3 0 1,1 9,12A3,3 0 0,1 6,15M18,11A1,1 0 1,1 17,12A1,1 0 0,1 18,11M20,13A1,1 0 1,1 19,14A1,1 0 0,1 20,13Z" />
+                        </svg>
+                    </div>
+                    <h2 class="profile-title">NEON RETRO</h2>
+                    <span class="profile-subtitle" style="color: var(--neon-blue);">80S REGENERATION</span>
+                </div>
+                
+                <div class="bio-text" style="margin-top: 14px; text-align: left; font-size: 0.72rem; line-height: 1.4;">
+                    <p style="margin-bottom: 10px; color: #fff;"><strong>Kong Invaders</strong> is a modern cybernetic reconstruction of the legendary 80s platforming, space invasion, and road crossing arcade genres.</p>
+                    <p style="color: #a8a8cf;">Our mission under the <strong>Old Men Coding</strong> banner is to regenerate the greatest gameplay formulas of the 1980s—reimagining them with vibrant neon aesthetics, synthwave audio, and custom tactical twists.</p>
+                </div>
+            </div>
+
+            <!-- Coming Soon Card -->
+            <div class="dashboard-card" style="padding: 16px;">
+                <div class="card-header" style="text-align: center; margin-bottom: 8px;">
+                    <h3 class="neon-pink" style="font-family: var(--font-title); font-size: 0.58rem; letter-spacing: 0.5px;">COMING SOON</h3>
+                </div>
+                <p style="font-size: 0.7rem; color: #fff; margin-bottom: 4px; font-weight: bold; text-align: center;">🕹️ Cyber Tank</p>
+                <p style="font-size: 0.68rem; color: #8080a0; text-align: center; line-height: 1.35;">Vector-graphic futuristic arena shooter fused with maze navigation obstacles and radar targeting.</p>
+            </div>
+
+            <!-- Support Card -->
+            <div class="dashboard-card" style="padding: 16px; text-align: center;">
+                <div class="card-header" style="margin-bottom: 8px;">
+                    <h3 class="neon-yellow-text" style="font-family: var(--font-title); font-size: 0.58rem; letter-spacing: 0.5px;">⚡ SUPPORT THE PORTAL</h3>
+                </div>
+                <p style="font-size: 0.68rem; color: #a8a8cf; line-height: 1.35; margin-bottom: 12px;">Support the development of new retro game cabinets by buying the developer a coffee.</p>
+                <a href="https://ko-fi.com/oldmencoding" target="_blank" class="arcade-btn" style="text-decoration: none; display: inline-block; font-size: 0.58rem; padding: 10px 0; width: 100%; box-shadow: 0 4px 0 #6d0034;">☕ Buy Mike a Coffee</a>
+            </div>
+
+            <!-- Disclaimer footer -->
+            <div style="font-size: 0.62rem; color: #505075; line-height: 1.35; text-align: center; padding: 8px 6px; border-top: 1px solid #1a1a3a;">
+                <strong style="color: #6a6a9f; display: block; margin-bottom: 4px; font-family: var(--font-hud); font-size: 0.5rem; letter-spacing: 0.5px;">OLD MEN CODING</strong>
+                Handcrafting and evolving classic retro gaming formulas with neon visual overhauls.
+            </div>
+        </div>
+
+        <!-- Main Cabinet Container -->
+        <div class="cabinet-container">
+            <!-- Header Brand Sign -->
+            <header class="arcade-header">
+                <h1 class="neon-text" data-text="KONG INVADERS">KONG INVADERS</h1>
+                <p class="neon-subtitle">80S FUSION EDITION</p>
+                <div style="margin-top: 8px;">
+                    <a href="index.html" class="footer-link" style="text-decoration: none; padding: 4px 10px; background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon-blue); border-radius: 4px; font-size: 0.7rem; font-family: var(--font-hud); letter-spacing: 0.5px; color: var(--neon-blue); display: inline-block;">🕹️ BACK TO LOBBY</a>
+                </div>
+            </header>
+
+            <!-- Main Cabinet Body -->
+            <div class="cabinet-body">
+                <!-- Glass Screen Bezel -->
+                <div class="screen-bezel" style="width: 480px; max-width: 100%;">
+                    <!-- Retro CRT Scanline Overlay -->
+                    <div class="crt-overlay"></div>
+                    
+                    <!-- Game Header HUD -->
+                    <div class="hud-container">
+                        <div class="hud-item score-board">
+                            <span class="hud-label">SCORE</span>
+                            <span id="score" class="hud-value neon-green">000000</span>
+                        </div>
+                        <div class="hud-item high-score-board">
+                            <span class="hud-label">HIGH SCORE</span>
+                            <span id="high-score" class="hud-value neon-pink">000000</span>
+                        </div>
+                        <div class="hud-item lives-board">
+                            <span class="hud-label">INTEGRITY</span>
+                            <div id="lives-container" class="lives-icons">
+                                <!-- JS will inject integrity nodes here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screen Screen Content (Canvas & Overlays) -->
+                    <div class="screen-content">
+                        <canvas id="gameCanvas" width="480" height="600"></canvas>
+
+                        <!-- Game Screen Overlay (Start/Pause/GameOver) -->
+                        <div id="overlay" class="game-overlay active">
+                            <div class="overlay-card">
+                                <h2 id="overlay-title" class="neon-yellow">KONG INVADERS</h2>
+                                
+                                <div class="instructions-box" style="text-align: left; margin: 15px 0; font-size: 0.65rem; color: #a8a8cf; line-height: 1.5; border: 1px solid rgba(255,255,255,0.1); padding: 10px; background: rgba(0,0,0,0.4); border-radius: 4px;">
+                                    <p style="color: #fff; font-weight: bold; margin-bottom: 4px;">🕹️ CONTROLS:</p>
+                                    <p>• <strong>A / D</strong> (or <strong>Arrows</strong>): Move Left/Right</p>
+                                    <p>• <strong>W / S</strong> (or <strong>Up/Down</strong>): Climb Ladders</p>
+                                    <p>• <strong>Space / J</strong>: Jump</p>
+                                    <p>• <strong>F / Enter</strong>: Fire Blaster Laser</p>
+                                    <p style="color: var(--neon-yellow); margin-top: 6px;">💡 Deflect Kong's yellow bricks by shooting them!</p>
+                                </div>
+
+                                <div class="difficulty-container" style="margin-bottom: 15px;">
+                                    <span class="diff-label" style="font-size: 0.68rem;">DIFFICULTY:</span>
+                                    <div class="diff-options" style="display: flex; gap: 5px; margin-top: 5px;">
+                                        <button id="diff-easy" class="diff-btn">EASY</button>
+                                        <button id="diff-normal" class="diff-btn active">NORMAL</button>
+                                        <button id="diff-hard" class="diff-btn">HARD</button>
+                                        <button id="diff-insane" class="diff-btn">INSANE</button>
+                                    </div>
+                                </div>
+
+                                <button id="start-btn" class="arcade-btn">INSERT COIN & START</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Game Footer HUD -->
+                    <div class="hud-footer">
+                        <div class="hud-item">
+                            <span class="hud-label">LEVEL</span>
+                            <span id="level" class="hud-value neon-blue">1</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">KONG INTEGRITY</span>
+                            <span id="boss-life" class="hud-value neon-pink">100%</span>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">DIFFICULTY</span>
+                            <span id="hud-difficulty" class="hud-value neon-green">NORMAL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Under-Screen Panel Controls -->
+            <footer class="arcade-panel-footer">
+                <button id="pause-btn" class="panel-btn" disabled>⏸ Pause (P)</button>
+                <button id="mute-btn" class="panel-btn">🔊 Mute (M)</button>
+            </footer>
+        </div>
+
+        <!-- RIGHT: Highscores Leaderboard Panel -->
+        <div class="leaderboard-panel side-panel">
+            <div class="dashboard-card" style="padding: 16px;">
+                <div class="card-header" style="text-align: center; border-bottom: 1px solid #1c1c3a; padding-bottom: 8px; margin-bottom: 12px;">
+                    <h3 class="neon-blue" style="font-family: var(--font-title); font-size: 0.8rem; letter-spacing: 1px;">DATABASE_LEADERBOARD</h3>
+                </div>
+                
+                <div id="login-container" class="leaderboard-state active">
+                    <p style="font-size: 0.72rem; color: #a8a8cf; text-align: center; line-height: 1.4; margin-bottom: 12px;">
+                        Connect to the global system database to record your scores and compete.
+                    </p>
+                    <button id="lobby-login-btn" class="arcade-btn" style="font-size: 0.58rem; width: 100%; padding: 10px 0; box-shadow: 0 4px 0 #005f66;">🔗 CONNECT TO DATABASE</button>
+                </div>
+
+                <div id="leaderboard-container" class="leaderboard-state">
+                    <div class="user-profile-badge" style="display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 6px;">
+                        <span id="player-profile-name" style="color: var(--neon-blue);">USER: RUNNER</span>
+                        <a href="#" id="logout-btn" style="color: var(--neon-pink); text-decoration: none;">[ DISCONNECT ]</a>
+                    </div>
+                    <table class="high-score-table">
+                        <thead>
+                            <tr>
+                                <th>POS</th>
+                                <th>AGENT</th>
+                                <th>SCORE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <!-- JS will load highscores -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="dashboard-card" style="padding: 12px; font-size: 0.62rem; line-height: 1.4; color: #8888aa;">
+                <p style="color: #fff; font-weight: bold; margin-bottom: 4px; font-size: 0.65rem;">⚙️ SYSTEM DIAGNOSTIC</p>
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <div>PLATFORM PHYSICS: <span style="color: var(--neon-green);">OK</span></div>
+                    <div>INVADER WAVE GEN: <span style="color: var(--neon-green);">OK</span></div>
+                    <div>HIGHWAY DYNAMICS: <span style="color: var(--neon-green);">OK</span></div>
+                    <div>BOSS THREAT: <span style="color: var(--neon-yellow); text-shadow: 0 0 2px var(--neon-yellow);">HIGH</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Engine -->
+    <script src="kong_invaders.js"></script>
+</body>
+</html>
