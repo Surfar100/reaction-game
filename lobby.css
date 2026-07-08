@@ -272,6 +272,11 @@ body {
     box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
 }
 
+.kong-card:hover {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
+}
+
 .cabinet-screen {
     background-color: #030308;
     border: 2px solid #111122;
@@ -301,6 +306,11 @@ body {
 .pinball-logo {
     color: var(--neon-pink);
     text-shadow: 0 0 8px var(--neon-pink);
+}
+
+.kong-logo {
+    color: var(--neon-green);
+    text-shadow: 0 0 8px var(--neon-green);
 }
 
 .game-version {
@@ -358,6 +368,20 @@ body {
     background-color: var(--neon-pink);
     color: #000;
     box-shadow: 0 0 12px var(--neon-pink);
+    font-weight: bold;
+}
+
+.kong-glow {
+    background-color: rgba(0, 255, 102, 0.08);
+    border-color: var(--neon-green);
+    color: #fff;
+    box-shadow: 0 4px 0 rgba(0, 255, 102, 0.3);
+}
+
+.kong-glow:hover {
+    background-color: var(--neon-green);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-green);
     font-weight: bold;
 }
 
